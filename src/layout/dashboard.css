@@ -1,0 +1,164 @@
+/* ── Dashboard shell ── */
+
+.dashboard {
+  display: flex;
+  min-height: 100%;
+  height: 100%;
+}
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  background: #eef1f5;
+}
+
+/* ── Side navigation ── */
+
+.side-nav {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px;
+  background: #fefefe;
+  border-right: 1px solid #e5e7eb;
+}
+
+.side-nav-brand {
+  padding: 0 8px;
+}
+
+.side-nav-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.33;
+  color: var(--color-text-primary);
+}
+
+.side-nav-section-label {
+  margin: 0 0 8px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.33;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.side-nav-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.side-nav-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.33;
+  color: var(--color-text-primary);
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.side-nav-item:hover {
+  background: #f3f4f6;
+}
+
+.side-nav-item.is-active {
+  background: var(--color-filter-active-bg);
+  color: var(--color-filter-active-text);
+}
+
+/* ── Interaction panel ── */
+
+.interaction-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 16px 32px 24px;
+}
+
+.interaction-header {
+  margin-bottom: 16px;
+}
+
+.interaction-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.33;
+  color: var(--color-text-primary);
+}
+
+.interaction-description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.33;
+  color: var(--color-text-secondary);
+}
+
+.interaction-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.interaction-live {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Phone shell ── */
+
+.phone-shell-center {
+  --phone-scale: min(1, calc((100vh - 64px) / var(--phone-height)));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px 0 16px;
+}
+
+.phone-scale {
+  width: calc(var(--phone-width) * var(--phone-scale));
+  height: calc(var(--phone-height) * var(--phone-scale));
+  flex-shrink: 0;
+}
+
+.phone {
+  width: var(--phone-width);
+  height: var(--phone-height);
+  transform: scale(var(--phone-scale));
+  transform-origin: top left;
+  background: #fff;
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 24px 80px rgba(29, 41, 57, 0.18),
+    0 0 0 1px rgba(29, 41, 57, 0.06);
+}
+
+.phone-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.phone-scroll.locked {
+  overflow: hidden;
+}

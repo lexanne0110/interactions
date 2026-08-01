@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="reception">
+<mask id="mask0_0_47" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="15" height="15">
+<path id="reception mask" fill-rule="evenodd" clip-rule="evenodd" d="M15 15V0L0 15H15Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_47)">
+<g id="30" opacity="0.3">
+<path id="Rectangle-path" fill-rule="evenodd" clip-rule="evenodd" d="M11.25 0V15H15V0H11.25Z" fill="#101828"/>
+<path id="Rectangle-path_2" fill-rule="evenodd" clip-rule="evenodd" d="M7.50002 0V15H11.25V0H7.50002Z" fill="#101828"/>
+</g>
+<g id="90" opacity="0.9">
+<path id="Rectangle-path_3" fill-rule="evenodd" clip-rule="evenodd" d="M3.75001 0V15H7.50001V0H3.75001Z" fill="#101828"/>
+<path id="Rectangle-path_4" fill-rule="evenodd" clip-rule="evenodd" d="M0 0V15H3.75V0H0Z" fill="#101828"/>
+</g>
+</g>
+</g>
+</svg>

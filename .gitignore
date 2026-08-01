@@ -1,0 +1,23 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+
+# Shareable zip / unzipped build copies
+jiffy-interactions.zip
+jiffy-interactions/
+
+# Debug / audit screenshots from development
+.close-*/
+.close-*.png
+audit-*.png
+verify-*.png
+final-*.png
+row1-*.png
+.record-tmp/
+.tmp/
+
+# Large demo recordings — commit intentionally if you want them in the repo
+public/videos/*.mp4
