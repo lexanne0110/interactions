@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 export type HeroBg = 'tan' | 'cream';
 
 export type ProductImage = {
@@ -50,19 +51,19 @@ export function productCartThumb(product: Product): string {
 }
 
 export const searchSuggestions: Suggestion[] = [
-  { id: 's1', label: 'Aashirvaad Atta', image: '/assets/suggestions/suggestion-1.png' },
-  { id: 's2', label: 'Wheat Atta', image: '/assets/suggestions/suggestion-2.png' },
-  { id: 's3', label: 'Multigrain Atta', image: '/assets/suggestions/suggestion-3.png' },
-  { id: 's4', label: 'Khapli Wheat Atta', image: '/assets/suggestions/suggestion-4.png' },
-  { id: 's5', label: 'Chakki Atta', image: '/assets/suggestions/suggestion-5.png' },
+  { id: 's1', label: 'Aashirvaad Atta', image: assetUrl('/assets/suggestions/suggestion-1.png') },
+  { id: 's2', label: 'Wheat Atta', image: assetUrl('/assets/suggestions/suggestion-2.png') },
+  { id: 's3', label: 'Multigrain Atta', image: assetUrl('/assets/suggestions/suggestion-3.png') },
+  { id: 's4', label: 'Khapli Wheat Atta', image: assetUrl('/assets/suggestions/suggestion-4.png') },
+  { id: 's5', label: 'Chakki Atta', image: assetUrl('/assets/suggestions/suggestion-5.png') },
 ];
 
 export const recentSearches: Suggestion[] = [
-  { id: 'r1', label: 'Aashirvaad Atta', image: '/assets/suggestions/suggestion-1.png' },
-  { id: 'r2', label: 'Potato', image: '/assets/products/suggest-2.png' },
-  { id: 'r3', label: 'Ice', image: '/assets/products/suggest-3.png' },
-  { id: 'r4', label: 'Noodles', image: '/assets/products/suggest-4.png' },
-  { id: 'r5', label: 'Sheba Cat Food', image: '/assets/products/suggest-5.png' },
+  { id: 'r1', label: 'Aashirvaad Atta', image: assetUrl('/assets/suggestions/suggestion-1.png') },
+  { id: 'r2', label: 'Potato', image: assetUrl('/assets/products/suggest-2.png') },
+  { id: 'r3', label: 'Ice', image: assetUrl('/assets/products/suggest-3.png') },
+  { id: 'r4', label: 'Noodles', image: assetUrl('/assets/products/suggest-4.png') },
+  { id: 'r5', label: 'Sheba Cat Food', image: assetUrl('/assets/products/suggest-5.png') },
 ];
 
 export const ATTA_QUERY = 'atta';
@@ -78,17 +79,17 @@ export const row1Products: Product[] = [
     eta: '60 mins',
     heroBg: 'tan',
     images: [
-      { src: '/assets/products/multigrains-3228.png', layer: '3228' },
-      { src: '/assets/products/spinach-3233.png', layer: '3233' },
+      { src: assetUrl('/assets/products/multigrains-3228.png'), layer: '3228' },
+      { src: assetUrl('/assets/products/spinach-3233.png'), layer: '3233' },
     ],
     expandable: true,
-    popupHeroImage: '/assets/products/spinach-3233.png',
+    popupHeroImage: assetUrl('/assets/products/spinach-3233.png'),
     popupHeroClass: 'popup-hero-spinach',
     popupHeroSlotClass: 'popup-hero-slot-fill',
     brand: {
       name: 'Fresh Greens',
       subtitle: 'Explore all vegetables',
-      logo: '/assets/brands/brand-avatar-1.png',
+      logo: assetUrl('/assets/brands/brand-avatar-1.png'),
     },
   },
   {
@@ -99,14 +100,14 @@ export const row1Products: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'cream',
-    images: [{ src: '/assets/products/aashirvaad-atta-hero.png', layer: 'hero' }],
+    images: [{ src: assetUrl('/assets/products/aashirvaad-atta-hero.png'), layer: 'hero' }],
     previouslyBought: true,
     expandable: true,
-    popupHeroImage: '/assets/products/popup-hero.png',
+    popupHeroImage: assetUrl('/assets/products/popup-hero.png'),
     brand: {
       name: 'Aashirvaad',
       subtitle: 'Explore all products',
-      logo: '/assets/brands/aashirvaad-logo.png',
+      logo: assetUrl('/assets/brands/aashirvaad-logo.png'),
     },
   },
   {
@@ -117,16 +118,16 @@ export const row1Products: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'tan',
-    images: [{ src: '/assets/products/multigrains-3238.png', layer: '3238' }],
+    images: [{ src: assetUrl('/assets/products/multigrains-3238.png'), layer: '3238' }],
     previouslyBought: true,
     expandable: true,
-    popupHeroImage: '/assets/products/multigrains-3238.png',
+    popupHeroImage: assetUrl('/assets/products/multigrains-3238.png'),
     popupHeroClass: 'popup-hero-apple',
     popupHeroSlotClass: 'popup-hero-slot-fill',
     brand: {
       name: 'Fresh Fruits',
       subtitle: 'Explore all fruits',
-      logo: '/assets/brands/brand-avatar-2.png',
+      logo: assetUrl('/assets/brands/brand-avatar-2.png'),
     },
   },
 ];
@@ -156,8 +157,8 @@ export const row2Products: Product[] = [
     eta: '60 mins',
     heroBg: 'tan',
     images: [
-      { src: '/assets/products/multigrains-3228.png', layer: '3228' },
-      { src: '/assets/products/multigrains-3254.png', layer: '3254' },
+      { src: assetUrl('/assets/products/multigrains-3228.png'), layer: '3228' },
+      { src: assetUrl('/assets/products/multigrains-3254.png'), layer: '3254' },
     ],
     previouslyBought: true,
   },
@@ -169,7 +170,7 @@ export const row2Products: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'cream',
-    images: [{ src: '/assets/products/apple-layer46.png', layer: 'layer46' }],
+    images: [{ src: assetUrl('/assets/products/apple-layer46.png'), layer: 'layer46' }],
   },
   {
     id: 'apple',
@@ -179,7 +180,7 @@ export const row2Products: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'tan',
-    images: [{ src: '/assets/products/multigrains-3238.png', layer: '3238' }],
+    images: [{ src: assetUrl('/assets/products/multigrains-3238.png'), layer: '3238' }],
     previouslyBought: true,
   },
 ];
@@ -195,7 +196,7 @@ export const recommendations: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'tan',
-    images: [{ src: '/assets/products/aashirvaad-multigrains.png' }],
+    images: [{ src: assetUrl('/assets/products/aashirvaad-multigrains.png') }],
   },
   {
     id: 'rec-2',
@@ -205,7 +206,7 @@ export const recommendations: Product[] = [
     mrp: '₹85',
     eta: '60 mins',
     heroBg: 'cream',
-    images: [{ src: '/assets/products/aashirvaad-atta-hero.png' }],
+    images: [{ src: assetUrl('/assets/products/aashirvaad-atta-hero.png') }],
   },
   {
     id: 'rec-3',
@@ -215,6 +216,6 @@ export const recommendations: Product[] = [
     mrp: '₹175',
     eta: '60 mins',
     heroBg: 'tan',
-    images: [{ src: '/assets/products/oil.png' }],
+    images: [{ src: assetUrl('/assets/products/oil.png') }],
   },
 ];

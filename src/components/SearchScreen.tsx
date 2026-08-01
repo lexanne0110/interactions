@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 import { ProductCard } from './ProductCard';
 import { SearchBar } from './SearchBar';
 import { row1Products, row2Products, searchSuggestions } from '../data/products';
@@ -38,11 +39,11 @@ export function SearchScreen({
       <div className="search-gradient" aria-hidden />
 
       <div className="status-bar">
-        <img className="status-time" src="/assets/icons/time-1047.svg" alt="10:47" />
+        <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
         <div className="status-icons">
-          <img src="/assets/icons/wifi.svg" alt="" aria-hidden />
-          <img src="/assets/icons/reception.svg" alt="" aria-hidden />
-          <img src="/assets/icons/battery.svg" alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
         </div>
       </div>
 
@@ -62,22 +63,22 @@ export function SearchScreen({
       <div className="filters content-column">
         <span className="chip chip-active">
           <span>Filters</span>
-          <img src="/assets/icons/x-green.svg" alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/x-green.svg')} alt="" aria-hidden />
         </span>
         <span className="chip chip-active chip-with-thumb">
           <span className="chip-thumb">
-            <img src="/assets/suggestions/suggestion-1.png" alt="" />
+            <img src={assetUrl('/assets/suggestions/suggestion-1.png')} alt="" />
           </span>
           <span>Aashirvaad</span>
-          <img src="/assets/icons/x-green.svg" alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/x-green.svg')} alt="" aria-hidden />
         </span>
         <span className="chip chip-sort">
           <span>Sort By</span>
-          <img src="/assets/icons/chevron-down.svg" alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/chevron-down.svg')} alt="" aria-hidden />
         </span>
         <span className="chip">
           <span>Price</span>
-          <img src="/assets/icons/chevron-down.svg" alt="" aria-hidden />
+          <img src={assetUrl('/assets/icons/chevron-down.svg')} alt="" aria-hidden />
         </span>
       </div>
 

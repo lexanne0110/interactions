@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 import { motion } from 'framer-motion';
 import type { Product } from '../data/products';
 import { cardLeafFadeIn } from '../lib/transitions';
@@ -23,7 +24,7 @@ export function CardMorphPreview({ product, closing = false }: Props) {
         >
           <img
             className="card-frame-bg"
-            src="/assets/products/card-frame.png"
+            src={assetUrl('/assets/products/card-frame.png')}
             alt=""
             aria-hidden
           />

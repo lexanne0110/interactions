@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -18,8 +19,8 @@ const DISPLAY_MS = 2800;
 const TRANSITION = { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
 
 const OFFER_ICONS = {
-  star: '/assets/category-listing/icons/star-06.svg',
-  'trend-down': '/assets/category-listing/icons/trend-down-01.svg',
+  star: assetUrl('/assets/category-listing/icons/star-06.svg'),
+  'trend-down': assetUrl('/assets/category-listing/icons/trend-down-01.svg'),
 };
 
 export function OfferBadgeRotator() {

@@ -1893,7 +1893,7 @@
   box-sizing: border-box;
   border: 0;
   border-radius: 0;
-  background: transparent url('/assets/category-listing/sidebar/thumbs/selected-chrome.png')
+  background: transparent var(--asset-sidebar-selected-chrome)
     center / 100% 100% no-repeat;
   pointer-events: none;
   opacity: 0;

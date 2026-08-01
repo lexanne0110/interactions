@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 export type CategoryProductLayout =
   | 'apple-3238'
   | 'banana-3254'
@@ -33,33 +34,33 @@ export const categorySidebarItems: CategorySidebarItem[] = [
   {
     id: 'oil',
     label: 'Oil & Ghee',
-    icon: '/assets/category-listing/sidebar/icons/oil.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/oil.png'),
   },
   {
     id: 'atta',
     label: 'Atta & Flour',
-    icon: '/assets/category-listing/sidebar/icons/atta.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/atta.png'),
     badge: '40% OFF',
   },
   {
     id: 'spices',
     label: 'Spices, Ma...',
-    icon: '/assets/category-listing/sidebar/icons/spices.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/spices.png'),
   },
   {
     id: 'sugar',
     label: 'Sugar',
-    icon: '/assets/category-listing/sidebar/icons/sugar.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/sugar.png'),
   },
   {
     id: 'rice',
     label: 'Rice & Ric..',
-    icon: '/assets/category-listing/sidebar/icons/rice.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/rice.png'),
   },
   {
     id: 'salts',
     label: 'Salts',
-    icon: '/assets/category-listing/sidebar/icons/salts.png',
+    icon: assetUrl('/assets/category-listing/sidebar/icons/salts.png'),
   },
 ];
 
@@ -132,10 +133,10 @@ export const categoryListingProducts: CategoryListingProduct[] = [
 ];
 
 export const LAYOUT_IMAGES: Record<CategoryProductLayout, string> = {
-  'apple-3238': '/assets/category-listing/product-3238.png',
-  'banana-3254': '/assets/category-listing/product-3254.png',
-  'greens-3235': '/assets/category-listing/product-3235.png',
-  'atta-151': '/assets/category-listing/product-151.png',
-  'pack-2856-full': '/assets/category-listing/product-2856-full.png',
-  'pack-2856-crop': '/assets/category-listing/product-2856-crop.png',
+  'apple-3238': assetUrl('/assets/category-listing/product-3238.png'),
+  'banana-3254': assetUrl('/assets/category-listing/product-3254.png'),
+  'greens-3235': assetUrl('/assets/category-listing/product-3235.png'),
+  'atta-151': assetUrl('/assets/category-listing/product-151.png'),
+  'pack-2856-full': assetUrl('/assets/category-listing/product-2856-full.png'),
+  'pack-2856-crop': assetUrl('/assets/category-listing/product-2856-crop.png'),
 };

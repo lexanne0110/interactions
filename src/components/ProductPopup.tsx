@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '../data/products';
@@ -535,11 +536,11 @@ export function ProductPopup({
               style={{ pointerEvents: visualProgress >= 1 ? 'auto' : 'none' }}
               aria-hidden={visualProgress < 0.5}
             >
-              <img className="status-time" src="/assets/icons/time-1047.svg" alt="10:47" />
+              <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
               <div className="status-icons">
-                <img src="/assets/icons/wifi.svg" alt="" aria-hidden />
-                <img src="/assets/icons/reception.svg" alt="" aria-hidden />
-                <img src="/assets/icons/battery.svg" alt="" aria-hidden />
+                <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
+                <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
+                <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
               </div>
             </motion.div>
           )}
@@ -663,7 +664,7 @@ export function ProductPopup({
                       }}
                     >
                       <span>View Product Details</span>
-                      <img src="/assets/icons/chevron-down.svg" alt="" aria-hidden />
+                      <img src={assetUrl('/assets/icons/chevron-down.svg')} alt="" aria-hidden />
                     </motion.button>
                   </motion.div>
                 </div>
@@ -689,7 +690,7 @@ export function ProductPopup({
                       </div>
                       <img
                         className="brand-chevron"
-                        src="/assets/icons/chevron-right-green.svg"
+                        src={assetUrl('/assets/icons/chevron-right-green.svg')}
                         alt=""
                         aria-hidden
                       />
@@ -734,9 +735,9 @@ export function ProductPopup({
 
                   <div className="view-all-row">
                     <div className="view-all-avatars">
-                      <img src="/assets/brands/brand-avatar-1.png" alt="" />
-                      <img src="/assets/brands/brand-avatar-2.png" alt="" />
-                      <img src="/assets/suggestions/suggestion-1.png" alt="" />
+                      <img src={assetUrl('/assets/brands/brand-avatar-1.png')} alt="" />
+                      <img src={assetUrl('/assets/brands/brand-avatar-2.png')} alt="" />
+                      <img src={assetUrl('/assets/suggestions/suggestion-1.png')} alt="" />
                     </div>
                     <span>View All Products</span>
                   </div>

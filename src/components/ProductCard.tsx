@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '../data/products';
@@ -67,7 +68,7 @@ export function ProductCard({
           >
             <img
               className="card-frame-bg"
-              src="/assets/products/card-frame.png"
+              src={assetUrl('/assets/products/card-frame.png')}
               alt=""
               aria-hidden
             />
@@ -122,7 +123,7 @@ export function ProductCard({
           >
             <img
               className="card-frame-bg"
-              src="/assets/products/card-frame.png"
+              src={assetUrl('/assets/products/card-frame.png')}
               alt=""
               aria-hidden
             />

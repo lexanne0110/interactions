@@ -1,3 +1,4 @@
+import { assetUrl } from '../lib/assetUrl';
 type Props = {
   variant: 'popup' | 'pdp';
   onBack: () => void;
@@ -15,18 +16,18 @@ export function HeroControls({ variant, onBack }: Props) {
         aria-label={isPopup ? 'Close' : 'Back'}
       >
         {isPopup ? (
-          <img src="/assets/icons/chevron-popup-close.svg" alt="" />
+          <img src={assetUrl('/assets/icons/chevron-popup-close.svg')} alt="" />
         ) : (
           <span className="hero-btn-back-icon">
-            <img src="/assets/icons/chevron-back.svg" alt="" />
+            <img src={assetUrl('/assets/icons/chevron-back.svg')} alt="" />
           </span>
         )}
       </button>
       <button type="button" className="hero-btn hero-btn-search" aria-label="Search">
-        <img src="/assets/icons/search-popup.svg" alt="" />
+        <img src={assetUrl('/assets/icons/search-popup.svg')} alt="" />
       </button>
       <button type="button" className="hero-btn hero-btn-share" aria-label="Share">
-        <img src="/assets/icons/share.svg" alt="" />
+        <img src={assetUrl('/assets/icons/share.svg')} alt="" />
       </button>
     </div>
   );

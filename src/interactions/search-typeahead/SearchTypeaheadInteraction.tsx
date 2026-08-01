@@ -1,3 +1,4 @@
+import { assetUrl } from '../../lib/assetUrl';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProductCard } from '../../components/ProductCard';
@@ -103,11 +104,11 @@ export function SearchTypeaheadInteraction() {
           />
 
           <div className="status-bar">
-            <img className="status-time" src="/assets/icons/time-1047.svg" alt="10:47" />
+            <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
             <div className="status-icons">
-              <img src="/assets/icons/wifi.svg" alt="" aria-hidden />
-              <img src="/assets/icons/reception.svg" alt="" aria-hidden />
-              <img src="/assets/icons/battery.svg" alt="" aria-hidden />
+              <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
+              <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
+              <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
             </div>
           </div>
 
@@ -122,7 +123,7 @@ export function SearchTypeaheadInteraction() {
                 >
                   <img
                     className="search-bar-back"
-                    src="/assets/icons/chevron-back.svg"
+                    src={assetUrl('/assets/icons/chevron-back.svg')}
                     alt=""
                     aria-hidden
                   />
@@ -137,7 +138,7 @@ export function SearchTypeaheadInteraction() {
                   placeholder="Search for 'Atta'"
                 />
 
-                <img className="search-bar-mic" src="/assets/icons/microphone.svg" alt="" aria-hidden />
+                <img className="search-bar-mic" src={assetUrl('/assets/icons/microphone.svg')} alt="" aria-hidden />
               </div>
             </div>
           </div>
@@ -187,22 +188,22 @@ export function SearchTypeaheadInteraction() {
                 >
                   <span className="chip chip-active">
                     <span>Filters</span>
-                    <img src="/assets/icons/x-green.svg" alt="" aria-hidden />
+                    <img src={assetUrl('/assets/icons/x-green.svg')} alt="" aria-hidden />
                   </span>
                   <span className="chip chip-active chip-with-thumb">
                     <span className="chip-thumb">
-                      <img src="/assets/suggestions/suggestion-1.png" alt="" />
+                      <img src={assetUrl('/assets/suggestions/suggestion-1.png')} alt="" />
                     </span>
                     <span>Aashirvaad</span>
-                    <img src="/assets/icons/x-green.svg" alt="" aria-hidden />
+                    <img src={assetUrl('/assets/icons/x-green.svg')} alt="" aria-hidden />
                   </span>
                   <span className="chip chip-sort">
                     <span>Sort By</span>
-                    <img src="/assets/icons/chevron-down.svg" alt="" aria-hidden />
+                    <img src={assetUrl('/assets/icons/chevron-down.svg')} alt="" aria-hidden />
                   </span>
                   <span className="chip">
                     <span>Price</span>
-                    <img src="/assets/icons/chevron-down.svg" alt="" aria-hidden />
+                    <img src={assetUrl('/assets/icons/chevron-down.svg')} alt="" aria-hidden />
                   </span>
                 </motion.div>
 
@@ -317,9 +318,9 @@ function CuratedSection({
       </div>
       <button type="button" className="search-typeahead-view-all">
         <span className="search-typeahead-view-all-thumbs" aria-hidden>
-          <img src="/assets/suggestions/suggestion-1.png" alt="" />
-          <img src="/assets/products/suggest-2.png" alt="" />
-          <img src="/assets/products/suggest-4.png" alt="" />
+          <img src={assetUrl('/assets/suggestions/suggestion-1.png')} alt="" />
+          <img src={assetUrl('/assets/products/suggest-2.png')} alt="" />
+          <img src={assetUrl('/assets/products/suggest-4.png')} alt="" />
         </span>
         View All Products
       </button>
