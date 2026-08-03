@@ -2,9 +2,10 @@ import { assetUrl } from '../lib/assetUrl';
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '../data/products';
-import { recommendations } from '../data/products';
+import { carouselExpandContext, expandableCarouselProducts, recommendations } from '../data/products';
 import { CardMorphPreview } from './CardMorphPreview';
 import { HeroControls } from './HeroControls';
+import { PopupCarouselPeek } from './PopupCarouselPeek';
 import { PreviouslyBoughtBadge } from './PreviouslyBoughtBadge';
 import {
   expandLayout,
@@ -18,6 +19,7 @@ import {
   PDP_FRAME,
   POPUP_FRAME,
   originToMorphTransform,
+  popupCarouselSheetLeft,
   popupSheetLeft,
 } from '../lib/expandOrigin';
 import {
@@ -45,6 +47,8 @@ type ViewMode = 'popup' | 'pdp';
 const INSTANT = { duration: 0 } as const;
 const CONTENT_REVEAL_DELAY_MS = 220;
 const SWIPE_THRESHOLD_PX = 48;
+const SWIPE_DRAG_CLAMP_PX = 96;
+const SWIPE_COMMIT_MS = 260;
 const CLOSE_SETTLE_CROSSFADE = {
   duration: closeTransition.duration,
   // Swap to card preview once the sheet has shrunk enough to read as a card.
@@ -94,8 +98,10 @@ export function ProductPopup({
   const closeMorphReadyAtRef = useRef(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const swipePointerIdRef = useRef<number | null>(null);
+  const swipeCommittedRef = useRef(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeTransitionActive, setSwipeTransitionActive] = useState(false);
   const animateProductSwapRef = useRef(false);
-  const swapTimerRef = useRef<number | null>(null);
   const openedOnceRef = useRef(false);
   const prevClosingRef = useRef(false);
   const closingSnapshotRef = useRef<{
@@ -152,12 +158,18 @@ export function ProductPopup({
   const showEmptyInfoShell = !showInfoContent && !scrollDrivenStyles && !shellMorphing;
   const pdpChrome = visualProgress >= CHROME_CROSSOVER;
   const heroControlsVariant = pdpChrome ? 'pdp' : 'popup';
-  const canSwipe =
-    morphComplete && !closing && mode === 'popup' && !scrollEngaged && !!onSwipe;
+  const carousel = carouselExpandContext(displayProduct.id);
+  const showCarousel =
+    !!onSwipe && morphComplete && !closing && mode === 'popup' && !scrollEngaged;
+  const popupFrameLeft = showCarousel
+    ? popupCarouselSheetLeft(POPUP_FRAME.width, !!carousel.next, !!carousel.prev)
+    : POPUP_FRAME.left;
+  const popupFrame: SheetFrame = { ...POPUP_FRAME, left: popupFrameLeft };
+  const canSwipe = showCarousel;
 
   const morphFrom = useMemo(
-    () => originToMorphTransform(expandOrigin, POPUP_FRAME),
-    [expandOrigin],
+    () => originToMorphTransform(expandOrigin, popupFrame),
+    [expandOrigin, popupFrame.left],
   );
 
   const closeMorphFrom = useMemo(
@@ -190,8 +202,8 @@ export function ProductPopup({
             : 'none',
       };
     }
-    return POPUP_FRAME;
-  }, [closing, expandOrigin, isCommittedPdp, scrollDrivenStyles, visualProgress]);
+    return popupFrame;
+  }, [closing, expandOrigin, isCommittedPdp, popupFrame, scrollDrivenStyles, visualProgress]);
 
   const sheetTransition = INSTANT;
   const transformTransition = morphCloseActive
@@ -275,6 +287,9 @@ export function ProductPopup({
       setClosePreviewVisible(false);
       suppressExpandRef.current = false;
       swipeStartRef.current = null;
+      swipeCommittedRef.current = false;
+      setSwipeOffset(0);
+      setSwipeTransitionActive(false);
       const sheet = sheetRef.current;
       const pointerId = swipePointerIdRef.current;
       if (sheet && pointerId != null && sheet.hasPointerCapture(pointerId)) {
@@ -328,31 +343,93 @@ export function ProductPopup({
 
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
-      if (!canSwipe || event.button !== 0) return;
+      if (!canSwipe || event.button !== 0 || swipeCommittedRef.current) return;
       const target = event.target as HTMLElement;
       if (target.closest('button, a, input, [role="button"]')) return;
       swipeStartRef.current = { x: event.clientX, y: event.clientY };
       swipePointerIdRef.current = event.pointerId;
+      setSwipeTransitionActive(false);
       event.currentTarget.setPointerCapture(event.pointerId);
     },
     [canSwipe],
   );
 
+  const commitSwipe = useCallback(
+    (direction: 'left' | 'right') => {
+      const neighbor = direction === 'left' ? carousel.prev : carousel.next;
+      if (!neighbor || swipeCommittedRef.current || !onSwipe) return;
+
+      swipeCommittedRef.current = true;
+      animateProductSwapRef.current = true;
+      setSwipeTransitionActive(true);
+
+      const travel = POPUP_FRAME.width + 40;
+      const exitX = direction === 'left' ? travel : -travel;
+      setSwipeOffset(exitX);
+
+      window.setTimeout(() => {
+        onSwipe(direction);
+        setSwipeOffset(direction === 'left' ? -travel : travel);
+        requestAnimationFrame(() => {
+          setSwipeOffset(0);
+          setSwipeTransitionActive(false);
+          swipeCommittedRef.current = false;
+          animateProductSwapRef.current = false;
+        });
+      }, SWIPE_COMMIT_MS);
+    },
+    [carousel.next, carousel.prev, onSwipe],
+  );
+
+  const handlePointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (!canSwipe || !swipeStartRef.current || swipeCommittedRef.current) return;
+      const dx = event.clientX - swipeStartRef.current.x;
+      const dy = event.clientY - swipeStartRef.current.y;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 12) {
+        swipeStartRef.current = null;
+        setSwipeOffset(0);
+        return;
+      }
+      const clamped =
+        dx > 0 && !carousel.prev
+          ? Math.min(dx, SWIPE_DRAG_CLAMP_PX) * 0.35
+          : dx < 0 && !carousel.next
+            ? Math.max(dx, -SWIPE_DRAG_CLAMP_PX) * 0.35
+            : Math.max(-SWIPE_DRAG_CLAMP_PX, Math.min(SWIPE_DRAG_CLAMP_PX, dx));
+      setSwipeOffset(clamped);
+    },
+    [canSwipe, carousel.next, carousel.prev],
+  );
+
   const finishSwipe = useCallback(
     (clientX: number, clientY: number) => {
-      if (!canSwipe || !swipeStartRef.current) return;
+      if (!canSwipe || !swipeStartRef.current || swipeCommittedRef.current) return;
 
       const dx = clientX - swipeStartRef.current.x;
       const dy = clientY - swipeStartRef.current.y;
       swipeStartRef.current = null;
 
-      if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return;
+      if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) {
+        setSwipeTransitionActive(true);
+        setSwipeOffset(0);
+        return;
+      }
 
-      // Finger left (dx < 0) → left neighbor; finger right (dx > 0) → right neighbor.
-      animateProductSwapRef.current = true;
-      onSwipe?.(dx < 0 ? 'left' : 'right');
+      // Drag left → next product; drag right → previous.
+      if (dx < 0 && carousel.next) {
+        commitSwipe('right');
+        return;
+      }
+      if (dx > 0 && carousel.prev) {
+        commitSwipe('left');
+        return;
+      }
+
+      setSwipeTransitionActive(true);
+      setSwipeOffset(0);
     },
-    [canSwipe, onSwipe],
+    [canSwipe, carousel.next, carousel.prev, commitSwipe],
   );
 
   const handlePointerUp = useCallback(
@@ -369,6 +446,9 @@ export function ProductPopup({
   const handlePointerCancel = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
       swipeStartRef.current = null;
+      swipeCommittedRef.current = false;
+      setSwipeTransitionActive(true);
+      setSwipeOffset(0);
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
@@ -386,21 +466,9 @@ export function ProductPopup({
       return;
     }
 
-    setContentVisible(false);
-    swapTimerRef.current = window.setTimeout(() => {
-      setDisplayProduct(product);
-      setContentVisible(true);
-      setSwapGeneration((generation) => generation + 1);
-      animateProductSwapRef.current = false;
-      swapTimerRef.current = null;
-    }, popupContentFadeOut.duration * 1000);
-
-    return () => {
-      if (swapTimerRef.current != null) {
-        window.clearTimeout(swapTimerRef.current);
-        swapTimerRef.current = null;
-      }
-    };
+    setDisplayProduct(product);
+    setContentVisible(true);
+    setSwapGeneration((generation) => generation + 1);
   }, [product, displayProduct.id]);
 
   const belowFoldPdp = visualProgress >= 1;
@@ -413,7 +481,10 @@ export function ProductPopup({
   const chromeFadeTransition = closing
     ? popupContentFadeOut
     : { duration: 0.28, ease: [0, 0, 0.2, 1] as const };
-  const transformFrame = closing ? closeTargetFrame : POPUP_FRAME;
+  const transformFrame = closing ? closeTargetFrame : popupFrame;
+  const swipeMotionTransition = swipeTransitionActive
+    ? { duration: SWIPE_COMMIT_MS / 1000, ease: [0.4, 0, 0.2, 1] as const }
+    : INSTANT;
   const closeContentOpacity = closing ? [1, 1, 0] : 1;
   const closePreviewOpacity = closing ? [0, 0, 1] : 0;
   const closeClipRatio =
@@ -452,12 +523,19 @@ export function ProductPopup({
       />
 
       <div
-        className={`popup-root ${showPdpLayout ? 'is-pdp' : ''} ${scrollDrivenStyles ? 'is-scroll-linked' : ''} ${shellMorphing ? 'is-morphing' : ''}`}
+        className={`popup-root ${showPdpLayout ? 'is-pdp' : ''} ${scrollDrivenStyles ? 'is-scroll-linked' : ''} ${shellMorphing ? 'is-morphing' : ''} ${showCarousel ? 'is-carousel' : ''}`}
         style={rootStyle}
       >
+        {showCarousel && carousel.prev && !carousel.next && (
+          <PopupCarouselPeek product={carousel.prev} side="left" />
+        )}
+        {showCarousel && carousel.next && (
+          <PopupCarouselPeek product={carousel.next} side="right" />
+        )}
+
         <motion.div
           ref={sheetRef}
-          className={`popup-sheet ${showPdpLayout ? 'is-pdp' : ''} ${scrollDrivenStyles ? 'is-scroll-driven' : ''} ${useTransformMorph ? 'is-morphing' : ''} ${closing ? 'is-closing' : ''} ${closePreviewVisible ? 'is-preview-swap' : ''}`}
+          className={`popup-sheet ${showPdpLayout ? 'is-pdp' : ''} ${scrollDrivenStyles ? 'is-scroll-driven' : ''} ${useTransformMorph ? 'is-morphing' : ''} ${closing ? 'is-closing' : ''} ${closePreviewVisible ? 'is-preview-swap' : ''} ${showCarousel ? 'is-carousel-active' : ''}`}
           initial={
             isOpenMorphing
               ? { ...morphFrom, borderRadius: expandOrigin.borderRadius }
@@ -469,17 +547,31 @@ export function ProductPopup({
                 ? {
                     ...closeMorphFrom,
                     borderRadius: expandOrigin.borderRadius,
+                    x: 0,
                   }
-                : { ...IDENTITY_MORPH, borderRadius: POPUP_FRAME.borderRadius }
+                : {
+                    ...IDENTITY_MORPH,
+                    borderRadius: POPUP_FRAME.borderRadius,
+                    x: showCarousel ? swipeOffset : 0,
+                  }
               : {
                   top: sheetFrame.top,
                   left: sheetFrame.left,
                   width: sheetFrame.width,
                   height: sheetFrame.height,
                   borderRadius: sheetFrame.borderRadius,
+                  x: showCarousel ? swipeOffset : 0,
                 }
           }
-          transition={useTransformMorph ? transformTransition : sheetTransition}
+          transition={
+            useTransformMorph
+              ? showCarousel && swipeTransitionActive
+                ? swipeMotionTransition
+                : transformTransition
+              : showCarousel && swipeTransitionActive
+                ? swipeMotionTransition
+                : sheetTransition
+          }
           onAnimationComplete={() => {
             if (isOpenMorphing) {
               setMorphComplete(true);
@@ -488,6 +580,7 @@ export function ProductPopup({
             }
           }}
           onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
           style={{
@@ -594,14 +687,14 @@ export function ProductPopup({
                 </div>
 
                 <div className="carousel-dots" aria-hidden={shellMorphing}>
-                  {!shellMorphing ? (
-                    <>
-                      <span className="dot active" />
-                      <span className="dot" />
-                      <span className="dot" />
-                      <span className="dot" />
-                    </>
-                  ) : null}
+                  {!shellMorphing
+                    ? expandableCarouselProducts.map((item, dotIndex) => (
+                        <span
+                          key={item.id}
+                          className={`dot${dotIndex === carousel.index ? ' active' : ''}`}
+                        />
+                      ))
+                    : null}
                 </div>
               </section>
 

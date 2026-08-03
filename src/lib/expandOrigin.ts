@@ -90,6 +90,19 @@ export function popupSheetLeft(width: number) {
   return (390 - width) / 2;
 }
 
+/** Visible strip of the next/prev popup sheet in the swipe carousel. */
+export const CAROUSEL_PEEK_PX = 36;
+
+export function popupCarouselSheetLeft(
+  sheetWidth: number,
+  hasNext: boolean,
+  hasPrev: boolean,
+): number {
+  if (hasNext) return 390 - sheetWidth - CAROUSEL_PEEK_PX;
+  if (hasPrev) return CAROUSEL_PEEK_PX;
+  return popupSheetLeft(sheetWidth);
+}
+
 /** Re-measure a grid card shell after swipe (open morph origin follows current product). */
 export function measureExpandOriginByProductId(productId: string): ExpandOrigin | null {
   const shell = document.querySelector(

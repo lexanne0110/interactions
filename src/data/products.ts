@@ -146,6 +146,20 @@ export function adjacentExpandableProduct(
   return expandableCarouselProducts[next] ?? null;
 }
 
+/** Carousel index and neighbors for the popup swipe strip. */
+export function carouselExpandContext(productId: string) {
+  const index = expandableCarouselProducts.findIndex((p) => p.id === productId);
+  return {
+    index,
+    total: expandableCarouselProducts.length,
+    prev: index > 0 ? expandableCarouselProducts[index - 1]! : null,
+    next:
+      index >= 0 && index < expandableCarouselProducts.length - 1
+        ? expandableCarouselProducts[index + 1]!
+        : null,
+  };
+}
+
 /** Row 2: bananas, tea, apple */
 export const row2Products: Product[] = [
   {
