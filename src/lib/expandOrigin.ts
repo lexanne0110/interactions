@@ -90,17 +90,34 @@ export function popupSheetLeft(width: number) {
   return (390 - width) / 2;
 }
 
-/** Visible strip of the next/prev popup sheet in the swipe carousel. */
+/** Visible strip of adjacent popup sheets in the swipe carousel. */
 export const CAROUSEL_PEEK_PX = 36;
+export const CAROUSEL_SHEET_WIDTH = 390 - 2 * CAROUSEL_PEEK_PX;
 
-export function popupCarouselSheetLeft(
-  sheetWidth: number,
-  hasNext: boolean,
-  hasPrev: boolean,
-): number {
-  if (hasNext) return 390 - sheetWidth - CAROUSEL_PEEK_PX;
-  if (hasPrev) return CAROUSEL_PEEK_PX;
-  return popupSheetLeft(sheetWidth);
+/** Popup frame inset so prev/next peeks are visible on both sides when possible. */
+export function carouselPopupFrame(hasPrev: boolean, hasNext: boolean): SheetFrame {
+  if (hasPrev && hasNext) {
+    return {
+      ...POPUP_FRAME,
+      left: CAROUSEL_PEEK_PX,
+      width: CAROUSEL_SHEET_WIDTH,
+    };
+  }
+  if (hasNext) {
+    return {
+      ...POPUP_FRAME,
+      left: 0,
+      width: 390 - CAROUSEL_PEEK_PX,
+    };
+  }
+  if (hasPrev) {
+    return {
+      ...POPUP_FRAME,
+      left: CAROUSEL_PEEK_PX,
+      width: 390 - CAROUSEL_PEEK_PX,
+    };
+  }
+  return POPUP_FRAME;
 }
 
 /** Re-measure a grid card shell after swipe (open morph origin follows current product). */

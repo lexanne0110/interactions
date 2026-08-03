@@ -732,9 +732,8 @@
   width: var(--carousel-peek-width, 36px);
   height: var(--popup-sheet-height);
   overflow: hidden;
-  z-index: 2;
+  z-index: 0;
   pointer-events: none;
-  opacity: 0.92;
 }
 
 .popup-carousel-peek--left {
@@ -746,16 +745,16 @@
 }
 
 .popup-carousel-peek-sheet {
-  width: var(--popup-width);
+  width: var(--carousel-sheet-width, var(--popup-width));
   height: 100%;
   background: var(--color-bg);
   border-radius: var(--radius-popup);
   overflow: hidden;
-  box-shadow: 0 8px 40px rgba(16, 24, 40, 0.08);
+  box-shadow: 0 8px 40px rgba(16, 24, 40, 0.12);
 }
 
 .popup-carousel-peek--left .popup-carousel-peek-sheet {
-  margin-left: calc(var(--popup-width) * -1 + var(--carousel-peek-width, 28px));
+  margin-left: calc(var(--carousel-sheet-width, var(--popup-width)) * -1 + var(--carousel-peek-width, 36px));
 }
 
 .popup-carousel-peek--right .popup-carousel-peek-sheet {

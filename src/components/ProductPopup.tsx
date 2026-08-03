@@ -18,8 +18,8 @@ import {
   IDENTITY_MORPH,
   PDP_FRAME,
   POPUP_FRAME,
+  carouselPopupFrame,
   originToMorphTransform,
-  popupCarouselSheetLeft,
   popupSheetLeft,
 } from '../lib/expandOrigin';
 import {
@@ -49,6 +49,7 @@ const CONTENT_REVEAL_DELAY_MS = 220;
 const SWIPE_THRESHOLD_PX = 48;
 const SWIPE_DRAG_CLAMP_PX = 96;
 const SWIPE_COMMIT_MS = 260;
+const CAROUSEL_SETTLE = { duration: 0.28, ease: [0.32, 0.72, 0, 1] as const };
 const CLOSE_SETTLE_CROSSFADE = {
   duration: closeTransition.duration,
   // Swap to card preview once the sheet has shrunk enough to read as a card.
@@ -161,15 +162,13 @@ export function ProductPopup({
   const carousel = carouselExpandContext(displayProduct.id);
   const showCarousel =
     !!onSwipe && morphComplete && !closing && mode === 'popup' && !scrollEngaged;
-  const popupFrameLeft = showCarousel
-    ? popupCarouselSheetLeft(POPUP_FRAME.width, !!carousel.next, !!carousel.prev)
-    : POPUP_FRAME.left;
-  const popupFrame: SheetFrame = { ...POPUP_FRAME, left: popupFrameLeft };
+  const carouselFrame = carouselPopupFrame(!!carousel.prev, !!carousel.next);
+  const popupFrame: SheetFrame = showCarousel ? carouselFrame : POPUP_FRAME;
   const canSwipe = showCarousel;
 
   const morphFrom = useMemo(
-    () => originToMorphTransform(expandOrigin, popupFrame),
-    [expandOrigin, popupFrame.left],
+    () => originToMorphTransform(expandOrigin, POPUP_FRAME),
+    [expandOrigin],
   );
 
   const closeMorphFrom = useMemo(
@@ -210,7 +209,9 @@ export function ProductPopup({
     ? closeTransition
     : isOpenMorphing
       ? openTransition
-      : INSTANT;
+      : showCarousel && !swipeTransitionActive
+        ? CAROUSEL_SETTLE
+        : INSTANT;
 
   const sheetStyle = scrollDrivenStyles
     ? { maxHeight: expandLayout.sheetHeight(visualProgress) }
@@ -524,9 +525,14 @@ export function ProductPopup({
 
       <div
         className={`popup-root ${showPdpLayout ? 'is-pdp' : ''} ${scrollDrivenStyles ? 'is-scroll-linked' : ''} ${shellMorphing ? 'is-morphing' : ''} ${showCarousel ? 'is-carousel' : ''}`}
-        style={rootStyle}
+        style={{
+          ...rootStyle,
+          ...(showCarousel
+            ? ({ ['--carousel-sheet-width' as string]: `${carouselFrame.width}px` } as const)
+            : {}),
+        }}
       >
-        {showCarousel && carousel.prev && !carousel.next && (
+        {showCarousel && carousel.prev && (
           <PopupCarouselPeek product={carousel.prev} side="left" />
         )}
         {showCarousel && carousel.next && (
@@ -553,6 +559,10 @@ export function ProductPopup({
                     ...IDENTITY_MORPH,
                     borderRadius: POPUP_FRAME.borderRadius,
                     x: showCarousel ? swipeOffset : 0,
+                    top: transformFrame.top,
+                    left: transformFrame.left,
+                    width: transformFrame.width,
+                    height: transformFrame.height,
                   }
               : {
                   top: sheetFrame.top,
@@ -586,12 +596,12 @@ export function ProductPopup({
           style={{
             position: 'absolute',
             transformOrigin: 'top left',
-            ...(useTransformMorph
+            ...(useTransformMorph && (isOpenMorphing || morphCloseActive)
               ? {
-                  top: transformFrame.top,
-                  left: transformFrame.left,
-                  width: transformFrame.width,
-                  height: transformFrame.height,
+                  top: isOpenMorphing ? POPUP_FRAME.top : transformFrame.top,
+                  left: isOpenMorphing ? POPUP_FRAME.left : transformFrame.left,
+                  width: isOpenMorphing ? POPUP_FRAME.width : transformFrame.width,
+                  height: isOpenMorphing ? POPUP_FRAME.height : transformFrame.height,
                 }
               : {}),
             boxShadow: sheetFrame.boxShadow ?? '0 8px 40px rgba(16, 24, 40, 0.12)',
