@@ -1,4 +1,4 @@
-# Jiffy Interactions
+# Interactions
 
 **New, standalone project** for coded Jiffy Revamp (Figma) interaction prototypes. This repo is separate from any older interaction library — use that only as a loose reference for dashboard patterns (sidebar, registry), not as a code dependency or shared runtime.
 
@@ -7,7 +7,7 @@
 **Do not double-click `index.html`** — this app needs a local server.
 
 ```bash
-cd ~/Projects/jiffy-interactions
+cd ~/Projects/interactions
 npm install
 npm start
 ```
@@ -68,7 +68,9 @@ npm run build
 
 Deploy the `dist/` folder to [Vercel](https://vercel.com), [Netlify](https://netlify.com), or GitHub Pages.
 
-Share: `https://your-site.vercel.app/#/search-to-pdp/card-expand`
+**Live site:** https://lexanne0110.github.io/interactions/
+
+Share: `https://lexanne0110.github.io/interactions/#/search-to-pdp/card-expand`
 
 ## Assets
 

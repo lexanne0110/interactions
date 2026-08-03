@@ -1,6 +1,6 @@
 # Project scope
 
-**Jiffy Interactions** (`~/Projects/jiffy-interactions`) is a fresh codebase for Figma-accurate interaction prototypes.
+**Interactions** (`~/Projects/interactions`) is a fresh codebase for Figma-accurate interaction prototypes.
 
 ## Relationship to the old interaction library
 

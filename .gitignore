@@ -6,8 +6,8 @@ dist/
 .env.*
 
 # Shareable zip / unzipped build copies
-jiffy-interactions.zip
-jiffy-interactions/
+interactions.zip
+interactions/
 
 # Debug / audit screenshots from development
 .close-*/
