@@ -1,6 +1,7 @@
 import { assetUrl } from '../lib/assetUrl';
 import { ProductCard } from './ProductCard';
 import { SearchBar } from './SearchBar';
+import { StatusBar } from './StatusBar';
 import { row1Products, row2Products, searchSuggestions } from '../data/products';
 import type { Product } from '../data/products';
 import type { ExpandOrigin } from '../lib/expandOrigin';
@@ -38,14 +39,7 @@ export function SearchScreen({
     <div className="search">
       <div className="search-gradient" aria-hidden />
 
-      <div className="status-bar">
-        <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
-        <div className="status-icons">
-          <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
-          <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
-          <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
-        </div>
-      </div>
+      <StatusBar />
 
       <SearchBar />
 

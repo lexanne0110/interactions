@@ -6,7 +6,7 @@ import type { ExpandOrigin } from '../lib/expandOrigin';
 import { measureExpandOrigin } from '../lib/expandOrigin';
 import { AddButtonStepper } from './AddButtonStepper';
 import { CardHeroImages } from './CardHeroImages';
-import { cardLeafFadeOut } from '../lib/transitions';
+import { cardLeafFadeIn, cardLeafFadeOut } from '../lib/transitions';
 
 type Props = {
   product: Product;
@@ -32,7 +32,12 @@ export function ProductCard({
   const shellRef = useRef<HTMLDivElement>(null);
   const isExpandable = product.expandable && !disableExpand;
   const leafVisible = !hidden;
-  const leafTransition = hidden ? cardLeafFadeOut : { duration: 0 };
+  // Un-hiding only ever happens during a close — either the non-target cards coming back
+  // when the popup starts collapsing, or the target card at the handoff. `{duration: 0}`
+  // made both of those snap; they now fade on the close curve so the grid settles rather
+  // than popping. (Mount is unaffected: framer seeds initial from animate, so a card that
+  // starts visible does not animate in.)
+  const leafTransition = hidden ? cardLeafFadeOut : cardLeafFadeIn;
 
   const handleExpand = () => {
     if (!shellRef.current) return;
@@ -43,20 +48,20 @@ export function ProductCard({
     <article
       data-product-id={product.id}
       className={`product-card ${isExpandable ? 'expandable' : ''} ${hidden ? 'is-hidden' : ''}`}
-      onClick={isExpandable ? handleExpand : undefined}
-      onKeyDown={
-        isExpandable
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleExpand();
-              }
-            }
-          : undefined
-      }
-      role={isExpandable ? 'button' : undefined}
-      tabIndex={isExpandable ? 0 : undefined}
     >
+      {/* A stretched hit area rather than role="button" on the <article>. The card
+          contains the ADD control, and a button role may not contain other interactive
+          elements — that nesting also made Enter/Space ambiguous between the two. */}
+      {isExpandable && (
+        <button
+          type="button"
+          className="card-expand-hit"
+          aria-label={`View details for ${product.title}`}
+          tabIndex={hidden ? -1 : 0}
+          onClick={handleExpand}
+        />
+      )}
+
       {isExpandable ? (
         <div
           key={`card-expand-${layoutResetKey}`}

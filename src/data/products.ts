@@ -160,14 +160,25 @@ export function carouselExpandContext(productId: string) {
   };
 }
 
-/** Row 2: bananas, tea, apple */
+/**
+ * Row 2: bananas, tea, apple.
+ *
+ * The asset filenames are misleading — `multigrains-3228.png` is the banana shot,
+ * `multigrains-3238.png` is the apple shot, and `apple-layer46.png` is the tea packet.
+ * Ids and titles below describe what the images actually show; the files keep their
+ * Figma export names so the paths stay stable.
+ *
+ * Prices/sizes are deliberately distinct from row 1 — every product previously read
+ * "Aashirvaad Atta with Multigrains, 500 g, ₹61", which made mini-cart thumbs and the
+ * cart badge impossible to tell apart while demoing.
+ */
 export const row2Products: Product[] = [
   {
     id: 'banana',
-    title: 'Aashirvaad Atta with Multigrains',
-    size: '500 g',
-    price: '₹61',
-    mrp: '₹85',
+    title: 'Fresh Bananas',
+    size: '6 pcs',
+    price: '₹48',
+    mrp: '₹60',
     eta: '60 mins',
     heroBg: 'tan',
     images: [
@@ -177,21 +188,21 @@ export const row2Products: Product[] = [
     previouslyBought: true,
   },
   {
-    id: 'atta-cream',
-    title: 'Aashirvaad Atta with Multigrains',
-    size: '500 g',
-    price: '₹61',
-    mrp: '₹85',
+    id: 'tea',
+    title: 'Tata Tea Kanan Devan Strong',
+    size: '250 g',
+    price: '₹135',
+    mrp: '₹160',
     eta: '60 mins',
     heroBg: 'cream',
     images: [{ src: assetUrl('/assets/products/apple-layer46.png'), layer: 'layer46' }],
   },
   {
     id: 'apple',
-    title: 'Aashirvaad Atta with Multigrains',
-    size: '500 g',
-    price: '₹61',
-    mrp: '₹85',
+    title: 'Royal Gala Apples',
+    size: '4 pcs',
+    price: '₹112',
+    mrp: '₹140',
     eta: '60 mins',
     heroBg: 'tan',
     images: [{ src: assetUrl('/assets/products/multigrains-3238.png'), layer: '3238' }],

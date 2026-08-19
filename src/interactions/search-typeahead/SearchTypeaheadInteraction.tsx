@@ -2,6 +2,7 @@ import { assetUrl } from '../../lib/assetUrl';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ProductCard } from '../../components/ProductCard';
+import { StatusBar } from '../../components/StatusBar';
 import {
   ATTA_QUERY,
   recentSearches,
@@ -103,14 +104,7 @@ export function SearchTypeaheadInteraction() {
             transition={{ duration: 0.45, ease: EASE }}
           />
 
-          <div className="status-bar">
-            <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
-            <div className="status-icons">
-              <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
-              <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
-              <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
-            </div>
-          </div>
+          <StatusBar />
 
           <div className="search-typeahead-bar">
             <div className="search-bar-wrap content-column">
@@ -133,6 +127,7 @@ export function SearchTypeaheadInteraction() {
                   autoFocus
                   type="text"
                   className="search-typeahead-input"
+                  aria-label="Search products"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search for 'Atta'"
@@ -153,12 +148,15 @@ export function SearchTypeaheadInteraction() {
                 animate="show"
                 exit="exit"
               >
+                {/* These are real buttons, so they do something: picking a suggestion
+                    commits it as the query rather than leaving focusable dead controls. */}
                 {searchSuggestions.map((item) => (
                   <motion.button
                     key={item.id}
                     type="button"
                     className="suggestion-item search-typeahead-suggestion"
                     variants={suggestionItem}
+                    onClick={() => setQuery(ATTA_QUERY)}
                   >
                     <div className="suggestion-thumb">
                       <img src={item.image} alt="" />

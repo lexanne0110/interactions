@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { SearchScreen } from '../../components/SearchScreen';
 import { MiniCartBar } from '../../components/MiniCartBar';
 import { products, type Product } from '../../data/products';
@@ -55,11 +54,14 @@ export function MiniCartInteraction() {
         />
       </div>
 
-      <AnimatePresence>
-        {showCart && (
-          <MiniCartBar items={cartItems} uniqueCount={cartOrder.length} />
-        )}
-      </AnimatePresence>
+      {/* Kept mounted rather than wrapped in AnimatePresence: a cancelled exit reuses the
+          same instance, which stranded the bar's "expanded" state and skipped the open
+          choreography when an item was removed and immediately re-added. */}
+      <MiniCartBar
+        items={cartItems}
+        uniqueCount={cartOrder.length}
+        visible={showCart}
+      />
     </div>
   );
 }

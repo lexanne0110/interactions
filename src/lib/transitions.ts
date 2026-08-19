@@ -10,8 +10,35 @@ export const cardLeafFadeOut = { duration: 0.12, ease: openEase };
 /** Popup content — fade in after shell morph is ~50% done */
 export const popupContentFadeIn = { duration: 0.24, ease: openEase, delay: 0.16 };
 
-/** Popup carousel swipe — same fade curve as content reveal, without open delay */
-export const popupSwipeContentFadeIn = { duration: 0.24, ease: openEase };
+
+/** Carousel track snap after drag release — ease-out, no overshoot */
+export const carouselSnapEase = [0.25, 1, 0.35, 1] as const;
+
+const SNAP_MIN_S = 0.26;
+const SNAP_MAX_S = 0.42;
+
+/**
+ * Snap duration derived from the distance still to travel and how hard the user flicked.
+ *
+ * A hard flick should finish quickly; a slow drag released just past the threshold should
+ * ease in. `velocityPxPerSec` is the release velocity — its sign is ignored, only its
+ * magnitude matters, and a stationary release falls back to the slow end of the range.
+ */
+export function carouselSnapTransition(
+  distancePx: number,
+  velocityPxPerSec: number,
+) {
+  const distance = Math.abs(distancePx);
+  const speed = Math.abs(velocityPxPerSec);
+
+  if (distance < 1) return { duration: SNAP_MIN_S, ease: carouselSnapEase };
+
+  // Time the gesture would take to cover the remaining distance at its own speed.
+  const natural = speed > 0 ? distance / speed : SNAP_MAX_S;
+  const duration = Math.min(SNAP_MAX_S, Math.max(SNAP_MIN_S, natural));
+
+  return { duration, ease: carouselSnapEase };
+}
 
 /** Popup content — fade out at morph start (mirror of cardLeafFadeOut on open) */
 export const popupContentFadeOut = { duration: 0.15, ease: closeEase };
@@ -26,11 +53,6 @@ export function layoutTransition(closing: boolean) {
   return closing ? closeTransition : openTransition;
 }
 
-export function cardLeafTransition(hidden: boolean, closing: boolean) {
-  if (hidden) return cardLeafFadeOut;
-  if (closing) return cardLeafFadeIn;
-  return { duration: 0 };
-}
 
 export function popupContentTransition(closing: boolean) {
   if (closing) return popupContentFadeOut;

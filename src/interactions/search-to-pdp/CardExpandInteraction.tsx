@@ -21,6 +21,9 @@ export function CardExpandInteraction() {
   const morphDoneRef = useRef(false);
   const closingRef = useRef(false);
   const closeStartedAtRef = useRef(0);
+  /** Bumped on every expand, so a close's deferred teardown can tell whether the popup it
+   *  was tearing down is still the current one. */
+  const openGenerationRef = useRef(0);
   closingRef.current = closing;
 
   const overlayActive = open || closing || closeHandoff;
@@ -29,6 +32,7 @@ export function CardExpandInteraction() {
     (product: Product, origin: ExpandOrigin) => {
       if (open || closing) return;
       flushSync(() => {
+        openGenerationRef.current += 1;
         setClosing(false);
         setExpandOrigin(origin);
         setPopupProduct(product);
@@ -69,9 +73,20 @@ export function CardExpandInteraction() {
 
     flushSync(() => {
       setClosing(false);
+      // Also release the handoff here. Normally onCloseHandoffStart has already done it,
+      // but if we arrive via the fallback timer below that never ran — and leaving
+      // closeHandoff/handoffProductId set keeps the grid card hidden and the scroll
+      // locked for good.
+      setCloseHandoff(false);
+      setHandoffProductId(null);
     });
 
+    // Teardown is deferred a frame so the morph's last painted frame isn't yanked away.
+    // `closing` is already false by now though, so handleExpand will accept a tap in that
+    // window — if one lands, this teardown must not null out the popup that just opened.
+    const generation = openGenerationRef.current;
     requestAnimationFrame(() => {
+      if (openGenerationRef.current !== generation) return;
       setPopupProduct(null);
       setOriginProductId(null);
       setExpandOrigin(null);

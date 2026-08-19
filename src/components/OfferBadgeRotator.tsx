@@ -1,6 +1,6 @@
 import { assetUrl } from '../lib/assetUrl';
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 type OfferMessage = {
   id: string;
@@ -23,21 +23,49 @@ const OFFER_ICONS = {
   'trend-down': assetUrl('/assets/category-listing/icons/trend-down-01.svg'),
 };
 
+/**
+ * Cycles offer copy in place.
+ *
+ * WCAG 2.2.2 (Pause, Stop, Hide) applies — this auto-updates indefinitely, well past the
+ * 5s threshold — so rotation pauses on hover and on keyboard focus, and stops entirely
+ * when the user has asked for reduced motion. It also pauses while the tab is hidden, so
+ * a backgrounded prototype isn't burning a timer forever.
+ */
 export function OfferBadgeRotator() {
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [documentHidden, setDocumentHidden] = useState(
+    typeof document === 'undefined' ? false : document.hidden,
+  );
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    const onVisibility = () => setDocumentHidden(document.hidden);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  const rotating = !paused && !reduceMotion && !documentHidden;
+
+  useEffect(() => {
+    if (!rotating) return;
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % OFFER_MESSAGES.length);
     }, DISPLAY_MS);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [rotating]);
 
   const message = OFFER_MESSAGES[index];
 
   return (
-    <div className="offer-badge-slot">
+    <div
+      className="offer-badge-slot"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={message.id}
