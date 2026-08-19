@@ -8,6 +8,8 @@ dist/
 # Shareable zip / unzipped build copies
 interactions.zip
 interactions/
+jiffy-interactions.zip
+jiffy-interactions/
 
 # Debug / audit screenshots from development
 .close-*/

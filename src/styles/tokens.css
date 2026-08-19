@@ -50,8 +50,9 @@
   --popup-width: 352px;
   --popup-sheet-height: 797px;
   --popup-top-offset: 26px;
-  --carousel-peek-width: 36px;
-  --carousel-sheet-width: 318px;
+  --carousel-gap: 20px;
+  --carousel-peek-width: 20px;
+  --carousel-sheet-width: 310px;
   --popup-bottom-inset: 19px;
   --popup-hero-size: 368px;
   --pdp-hero-size: 422px;

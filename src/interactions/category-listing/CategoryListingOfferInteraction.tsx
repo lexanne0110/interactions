@@ -1,6 +1,8 @@
 import { assetUrl } from '../../lib/assetUrl';
+import { useState } from 'react';
 import { CategoryListingProductCard } from '../../components/CategoryListingProductCard';
 import { CategorySidebar } from '../../components/CategorySidebar';
+import { StatusBar } from '../../components/StatusBar';
 import {
   categoryListingProducts,
   categorySidebarItems,
@@ -9,17 +11,14 @@ import {
 import '../../App.css';
 
 export function CategoryListingOfferInteraction() {
+  // The sidebar isn't the subject of this demo, but its items are real buttons — leaving
+  // onSelect as a no-op left every one of them focusable and inert.
+  const [selectedId, setSelectedId] = useState(DEFAULT_SIDEBAR_SELECTION);
+
   return (
     <div className="phone-scroll">
       <div className="cl-screen">
-        <div className="status-bar">
-          <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
-          <div className="status-icons">
-            <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
-            <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
-            <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
-          </div>
-        </div>
+        <StatusBar />
 
         <div className="cl-toolbar">
           <button type="button" className="cl-toolbar-btn" aria-label="Back">
@@ -34,8 +33,8 @@ export function CategoryListingOfferInteraction() {
         <div className="cl-body">
           <CategorySidebar
             items={categorySidebarItems}
-            selectedId={DEFAULT_SIDEBAR_SELECTION}
-            onSelect={() => {}}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
           />
 
           <main className="cl-main">

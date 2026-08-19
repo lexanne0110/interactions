@@ -1,9 +1,8 @@
 import type { MouseEvent } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   openEase,
-  stepperCountEase,
   stepperCountEnterTransition,
   stepperCountExitTransition,
   stepperMorphFade,
@@ -65,7 +64,9 @@ export function AddButtonStepper({
   const [uncontrolledCount, setUncontrolledCount] = useState(0);
   const isControlled = controlledCount !== undefined;
   const count = isControlled ? controlledCount : uncontrolledCount;
-  const directionRef = useRef<'up' | 'down'>('up');
+  // State, not a ref: this is read during render to pick the slide direction, and a ref
+  // read during render is not safe under concurrent rendering.
+  const [direction, setDirection] = useState<'up' | 'down'>('up');
 
   const commitCount = (next: number) => {
     const prev = count;
@@ -79,20 +80,20 @@ export function AddButtonStepper({
 
   const handleInitialAdd = (e: MouseEvent) => {
     e.stopPropagation();
-    directionRef.current = 'up';
+    setDirection('up');
     commitCount(1);
   };
 
   const handleIncrement = (e: MouseEvent) => {
     e.stopPropagation();
     if (atMax) return;
-    directionRef.current = 'up';
+    setDirection('up');
     commitCount(Math.min(count + 1, MAX));
   };
 
   const handleDecrement = (e: MouseEvent) => {
     e.stopPropagation();
-    directionRef.current = 'down';
+    setDirection('down');
     commitCount(Math.max(count - 1, 0));
   };
 
@@ -170,35 +171,41 @@ export function AddButtonStepper({
               −
             </motion.button>
 
-            <motion.div
-              className="add-btn-stepper-count"
-              variants={controlItemVariants}
-              aria-live="polite"
-            >
+            <motion.div className="add-btn-stepper-count" variants={controlItemVariants}>
+              {/* The live region is its own node: `mode="sync"` keeps the outgoing and
+                  incoming spans mounted together, so announcing from the animated
+                  wrapper read out both values at once ("12", "5MAX"). */}
+              <span className="sr-only" aria-live="polite">
+                {atMax ? `Quantity ${MAX}, maximum reached` : `Quantity ${count}`}
+              </span>
               <AnimatePresence mode="sync" initial={false}>
                 <motion.span
                   key={countKey}
-                  custom={directionRef.current}
+                  custom={direction}
                   className={`add-btn-stepper-value ${atMax ? 'is-max' : ''}`}
                   variants={atMax ? maxVariants : countVariants}
                   initial="enter"
                   animate="center"
                   exit="exit"
+                  aria-hidden
                 >
                   {countLabel}
                 </motion.span>
               </AnimatePresence>
             </motion.div>
 
+            {/* No `animate` prop here on purpose: an explicit animate object stops this
+                child inheriting the parent's "visible" variant, which cost it the spring
+                scale-in and the stagger that − and the count get. The at-max dim is CSS
+                on :disabled instead. */}
             <motion.button
               type="button"
               className="add-btn-stepper-btn"
               variants={controlItemVariants}
               aria-label="Increase quantity"
               disabled={atMax}
-              animate={{ opacity: atMax ? 0.35 : 1 }}
-              transition={{ duration: 0.35, ease: stepperCountEase }}
               whileTap={atMax ? undefined : { scale: TAP_SCALE }}
+              transition={stepperTapTransition}
               onClick={handleIncrement}
             >
               +

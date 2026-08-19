@@ -90,34 +90,107 @@ export function popupSheetLeft(width: number) {
   return (390 - width) / 2;
 }
 
-/** Visible strip of adjacent popup sheets in the swipe carousel. */
-export const CAROUSEL_PEEK_PX = 36;
-export const CAROUSEL_SHEET_WIDTH = 390 - 2 * CAROUSEL_PEEK_PX;
+/** Gap between the active popup and neighbor peeks. */
+export const CAROUSEL_GAP_PX = 20;
 
-/** Popup frame inset so prev/next peeks are visible on both sides when possible. */
-export function carouselPopupFrame(hasPrev: boolean, hasNext: boolean): SheetFrame {
-  if (hasPrev && hasNext) {
-    return {
-      ...POPUP_FRAME,
-      left: CAROUSEL_PEEK_PX,
-      width: CAROUSEL_SHEET_WIDTH,
-    };
-  }
-  if (hasNext) {
-    return {
-      ...POPUP_FRAME,
-      left: 0,
-      width: 390 - CAROUSEL_PEEK_PX,
-    };
-  }
-  if (hasPrev) {
-    return {
-      ...POPUP_FRAME,
-      left: CAROUSEL_PEEK_PX,
-      width: 390 - CAROUSEL_PEEK_PX,
-    };
-  }
-  return POPUP_FRAME;
+/** Standard popup width when centered with peeks on both sides. */
+export const CAROUSEL_SHEET_WIDTH = 310;
+
+/** Visible neighbor peek when centered (390 − 310 − 40 = 40 → 20px each side). */
+export const CAROUSEL_PEEK_PX =
+  (390 - CAROUSEL_SHEET_WIDTH - 2 * CAROUSEL_GAP_PX) / 2;
+
+/** Peek zone + gap on one side. */
+export const CAROUSEL_SIDE_INSET = CAROUSEL_PEEK_PX + CAROUSEL_GAP_PX;
+
+/** Screen-edge margin on the side with no neighbor peek. */
+export const CAROUSEL_EDGE_INSET = 20;
+
+export type CarouselLayout = {
+  /** Active card width (330 on edges, 310 when centered). */
+  cardWidth: number;
+  /** Width a panel occupies — its own *active* width, so a peek is already the size
+   *  it will be once it becomes active. Keeps the post-snap swap pixel-identical. */
+  panelWidth: (index: number) => number;
+  mainLeft: number;
+  panelLeft: (index: number) => number;
+};
+
+/** Active card width for an index: 330 at either edge, 310 when centered. */
+export function carouselCardWidth(index: number, total: number): number {
+  const hasPrev = index > 0;
+  const hasNext = index < total - 1;
+
+  if (hasPrev && hasNext) return CAROUSEL_SHEET_WIDTH;
+  if (hasNext) return 390 - CAROUSEL_EDGE_INSET - CAROUSEL_SIDE_INSET;
+  if (hasPrev) return 390 - CAROUSEL_SIDE_INSET - CAROUSEL_EDGE_INSET;
+  return POPUP.sheetWidth;
+}
+
+/** Resting left edge of the active card at an index. */
+function carouselMainLeft(index: number, total: number): number {
+  const hasPrev = index > 0;
+  const hasNext = index < total - 1;
+
+  if (hasPrev && hasNext) return CAROUSEL_SIDE_INSET;
+  if (hasNext) return CAROUSEL_EDGE_INSET;
+  if (hasPrev) return CAROUSEL_SIDE_INSET;
+  return POPUP_FRAME.left;
+}
+
+/**
+ * Gap and peek only where a neighbor exists; 20px screen-edge inset on the far side.
+ *
+ * Panels are laid out by walking outward from the active card, each panel taking its
+ * own active width. Because a neighbor peek is already the width it will have once
+ * active, committing a swipe lands it exactly on the next `mainLeft` — which also makes
+ * every travel exactly one stride (330px), in both directions, at every index.
+ */
+export function carouselTrackLayout(index: number, total: number): CarouselLayout {
+  const mainLeft = carouselMainLeft(index, total);
+  const cardWidth = carouselCardWidth(index, total);
+  const panelWidth = (i: number) => carouselCardWidth(i, total);
+
+  const panelLeft = (i: number): number => {
+    if (i === index) return mainLeft;
+
+    if (i > index) {
+      let left = mainLeft + cardWidth + CAROUSEL_GAP_PX;
+      for (let j = index + 1; j < i; j += 1) {
+        left += panelWidth(j) + CAROUSEL_GAP_PX;
+      }
+      return left;
+    }
+
+    let right = mainLeft - CAROUSEL_GAP_PX;
+    for (let j = index - 1; j > i; j -= 1) {
+      right -= panelWidth(j) + CAROUSEL_GAP_PX;
+    }
+    return right - panelWidth(i);
+  };
+
+  return { cardWidth, panelWidth, mainLeft, panelLeft };
+}
+
+/** Drag offset to align target panel when committing a swipe. */
+export function carouselCommitDragX(
+  fromIndex: number,
+  toIndex: number,
+  total: number,
+): number {
+  const fromLayout = carouselTrackLayout(fromIndex, total);
+  const toLayout = carouselTrackLayout(toIndex, total);
+  return toLayout.mainLeft - fromLayout.panelLeft(toIndex);
+}
+
+/** Popup sheet frame for a carousel index (popup mode). */
+export function carouselSheetFrame(index: number, total: number): SheetFrame {
+  const layout = carouselTrackLayout(index, total);
+  return {
+    ...POPUP_FRAME,
+    left: layout.mainLeft,
+    width: layout.cardWidth,
+  };
 }
 
 /** Re-measure a grid card shell after swipe (open morph origin follows current product). */

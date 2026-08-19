@@ -2,6 +2,7 @@ import { assetUrl } from '../../lib/assetUrl';
 import { useState } from 'react';
 import { CategoryListingProductCard } from '../../components/CategoryListingProductCard';
 import { CategorySidebar } from '../../components/CategorySidebar';
+import { StatusBar } from '../../components/StatusBar';
 import {
   categoryListingProducts,
   categorySidebarItems,
@@ -15,14 +16,7 @@ export function CategoryListingL2TransitionInteraction() {
   return (
     <div className="phone-scroll">
       <div className="cl-screen">
-        <div className="status-bar">
-          <img className="status-time" src={assetUrl('/assets/icons/time-1047.svg')} alt="10:47" />
-          <div className="status-icons">
-            <img src={assetUrl('/assets/icons/wifi.svg')} alt="" aria-hidden />
-            <img src={assetUrl('/assets/icons/reception.svg')} alt="" aria-hidden />
-            <img src={assetUrl('/assets/icons/battery.svg')} alt="" aria-hidden />
-          </div>
-        </div>
+        <StatusBar />
 
         <div className="cl-toolbar">
           <button type="button" className="cl-toolbar-btn" aria-label="Back">
