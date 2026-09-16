@@ -1,0 +1,91 @@
+/* Scenario controls beside the phone. Dashboard chrome, not app UI — so it
+   uses the dashboard's neutral tokens and a plain switch, never the cart's
+   own toggle, which would read as something the shopper can tap. */
+
+.scenario-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+}
+
+.scenario-panel__eyebrow {
+  margin: 8px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.scenario-panel__lede {
+  margin: 0 0 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.scenario-panel__list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-filter-inactive-border);
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.scenario-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.scenario-switch + .scenario-switch { border-top: 1px solid var(--color-filter-inactive-border); }
+.scenario-switch:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+
+.scenario-switch__text { display: flex; flex-direction: column; gap: 2px; }
+.scenario-switch__label { font-size: 14px; font-weight: 600; line-height: 20px; }
+.scenario-switch__note { font-size: 12px; line-height: 16px; color: var(--color-text-secondary); }
+
+.scenario-switch__track {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: #d0d5dd;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.scenario-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scenario-switch.is-on .scenario-switch__track { background: var(--color-primary); }
+.scenario-switch.is-on .scenario-switch__thumb { transform: translateX(16px); }
+
+.scenario-panel__tries {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}

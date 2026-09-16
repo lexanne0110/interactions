@@ -5,11 +5,12 @@ dist/
 .env
 .env.*
 
-# Shareable zip / unzipped build copies
-interactions.zip
-interactions/
-jiffy-interactions.zip
-jiffy-interactions/
+# Shareable zip / unzipped build copies (root only — an unanchored `interactions/`
+# also matched src/interactions/ and silently ignored every new interaction file)
+/interactions.zip
+/interactions/
+/jiffy-interactions.zip
+/jiffy-interactions/
 
 # Debug / audit screenshots from development
 .close-*/
