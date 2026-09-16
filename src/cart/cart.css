@@ -1,0 +1,1010 @@
+/* =========================================================================
+   Cart — design tokens
+   Sourced from Jiffy Revamp → Cart Screens (Sept 2026 revision).
+   Deliberately scoped to .cart-screen so it does not collide with the
+   older PDP/search tokens in src/styles/tokens.css.
+   ========================================================================= */
+
+.cart-screen {
+  /* surfaces */
+  --c-page: #fefefe;
+  --c-header-grad-from: #fef7e5;
+  --c-header-grad-to: #fdfbf5;
+  /* Incognito retint. The header block is opaque, so it — not the band —
+     is what covers the strip's lower half. */
+  --c-incognito-grad-from: #1d2939;
+  --c-incognito-grad-to: #354b69;
+  --c-incognito-header: #c2d3eb;
+  /* Savings retint, sampled from Figma "Savings applied" (2125:4479). Ink on
+     the strip is ~4.8:1 at its darkest stop. */
+  --c-savings-grad-from: #54c964;
+  --c-savings-grad-to: #c0f5b2;
+  --c-savings-strip-from: #e3ffc1;
+  --c-savings-strip-to: #f8ffdc;
+  --c-savings-ink: #017e39;
+  --c-card: #fefefe;
+  --c-card-radius: 16px;
+  /* The canonical card: no border, so the shadow is the only edge. Figma's
+     literal DROP_SHADOW r4 — sampled from the reference render, the halo spans
+     4px and is darkest (#f1f1f1) right at the card edge. It was once doubled to
+     8px for legibility; that spread the halo twice as far and read as a heavy,
+     doubled edge. Do not widen it again. */
+  --c-card-shadow: 0 0 4px rgba(0, 0, 0, 0.12);
+  --c-thumb-bg: #fbf4e4;
+  --c-subtle: #f9f9f9;
+  --c-chip: #f7f7f8;
+
+  /* ink */
+  --c-ink: #1d2939;
+  --c-ink-2: #535f6b;
+  --c-muted: #667085;
+
+  /* brand */
+  --c-green: #039855;
+  --c-green-tint: #e0f7eb;
+  --c-green-pale: #f0f9f5;
+  --c-green-icon-bg: #d4ede2;
+  --c-pay-from: #016c31;
+  --c-pay-mid: #019f48;
+
+  /* lines */
+  --c-divider: #e8e9eb;
+  --c-hairline: #e5e7eb;
+
+  /* metrics */
+  --c-phone-w: 390px;
+  --c-gutter: 16px;
+  --c-content-w: 358px;
+  --c-card-pad: 12px;
+  --c-row-h: 58px;
+  --c-row-gap: 16px;
+  --c-section-gap: 32px;
+
+  font-family: 'Onest', system-ui, sans-serif;
+  position: relative;
+  width: var(--c-phone-w);
+  min-height: 100%;
+  background: var(--c-page);
+  color: var(--c-ink);
+  overflow: hidden;
+}
+
+/* ---------- generic card ---------- */
+/* Flex, not block: Figma cards stack their children on a gap, and a block card
+   silently drops that spacing — which is what made the bill read as cramped. */
+.cart-card {
+  width: var(--c-content-w);
+  background: var(--c-card);
+  border-radius: var(--c-card-radius);
+  box-shadow: var(--c-card-shadow);
+  padding: var(--c-card-pad);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* Flex children shrink by default. Inside an animating card that silently
+   compresses rows below their line-height, so the measured "auto" height never
+   matches what was animated to and the expand ends with a jump. */
+.cart-card > * { flex-shrink: 0; }
+
+/* Bill Card is 13 in Figma, which is what makes it 101 tall. */
+.cart-card.bill-card { gap: 13px; }
+
+/* ---------- scroll body ---------- */
+.cart-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.cart-scroll::-webkit-scrollbar { width: 0; height: 0; }
+
+.cart-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--c-section-gap);
+  /* 144px of footer clearance plus the most the body can travel: 35px for
+     incognito + 34px for the savings strip. Buying that as static slack keeps
+     both shifts pure transforms — animating padding instead would reflow every
+     card each frame — and the extra is invisible behind the sticky footer. */
+  padding: 112px var(--c-gutter) 213px;
+  box-sizing: border-box;
+}
+
+/* Sections must not clip: the card shadow needs to spill past its own box.
+   framer-motion only needs overflow hidden while a section is collapsing, so
+   that is applied in the exit variant rather than statically. */
+.cart-section-slot { overflow: visible; }
+
+/* A focused view renders one section; fill the phone so the footer sits at the
+   bottom rather than floating under a short column. */
+.cart-body--focused { min-height: 100%; }
+
+/* ---------- top chrome ---------- */
+.cart-topbar {
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--c-phone-w);
+  height: 92px;
+  background: linear-gradient(180deg, var(--c-header-grad-from) 0%, var(--c-header-grad-to) 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Stops at 63px on purpose. From there down the header's own opaque fill
+   covers the band, so a taller layer would only paint pixels nobody sees. */
+.cart-topbar--incognito {
+  height: 63px;
+  background: linear-gradient(
+    180deg,
+    var(--c-incognito-grad-from) 0%,
+    var(--c-incognito-grad-from) 44%,
+    var(--c-incognito-grad-to) 100%
+  );
+}
+
+.cart-status {
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--c-phone-w);
+  height: 28px;
+  padding: 8px 24px 5px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 4;
+}
+.cart-status__icons { display: flex; align-items: center; gap: 12px; }
+/* The status glyphs are dark SVGs. Rather than ship a white duplicate of each,
+   crush them to black and invert — any artwork comes out pure white. */
+.cart-status img { transition: filter 0.34s cubic-bezier(0.4, 0, 0.2, 1); }
+.cart-status.is-incognito img { filter: brightness(0) invert(1); }
+
+/* Full 92px: unlike incognito, nothing opaque covers the lower half. */
+.cart-topbar--savings {
+  background: linear-gradient(180deg, var(--c-savings-grad-from) 0%, var(--c-savings-grad-to) 100%);
+}
+
+/* Seated under the header, per Figma (y=92). z-index 2 puts it beneath the
+   band and header but above the scroll, so while retracted it is hidden
+   behind the chrome and slides out from under it. */
+.cart-strip--savings {
+  position: absolute;
+  top: 92px; left: 0;
+  width: var(--c-phone-w);
+  height: 34px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(90deg, var(--c-savings-strip-from) 0%, var(--c-savings-strip-to) 100%);
+  color: var(--c-savings-ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  pointer-events: none;
+}
+.cart-strip__text { display: inline-flex; align-items: baseline; white-space: nowrap; }
+
+/* The announcement the header uncovers as it slides down. */
+.cart-strip--incognito {
+  position: absolute;
+  top: 28px; left: 0;
+  width: var(--c-phone-w);
+  height: 34px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.cart-header {
+  position: absolute;
+  top: 28px; left: 0;
+  width: var(--c-phone-w);
+  height: 64px;
+  z-index: 4;
+}
+/* Transparent in the light state — the cream band behind it shows through. */
+.cart-header__tint {
+  position: absolute;
+  inset: 0;
+  background: var(--c-incognito-header);
+  /* framer animates the opacity on the header's own travel, so the tint
+     arrives with the header it is painted on at whichever pace is playing. */
+  opacity: 0;
+}
+.cart-header__btn {
+  position: absolute;
+  top: 13px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.cart-header__btn--back { left: 16px; }
+.cart-header__btn--search { left: 290px; }
+.cart-header__btn--share { left: 336px; }
+.cart-header__title {
+  position: absolute;
+  left: 66px; top: 21px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--c-ink);
+}
+/* Off: white pill, inner shadow, grey knob left. On: navy pill, knob right. */
+.cart-toggle {
+  position: absolute;
+  left: 230px; top: 18px;
+  width: 52.3px; height: 28px;
+  border: 0; padding: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: inset 0 1px 3px rgba(16, 24, 40, 0.14);
+  cursor: pointer;
+  transition: background 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cart-toggle.is-on { background: #2c3e57; }
+.cart-toggle__knob {
+  position: absolute;
+  top: 2.8px; left: 2.8px;
+  width: 22.4px; height: 22.4px;
+  border-radius: 50%;
+  background: #dde0e6;
+  box-shadow: 0 0 4px rgba(16, 24, 40, 0.18);
+  display: grid; place-items: center;
+  /* Travel is framer's (a spring, matching the repo's switch vocabulary);
+     only the colour is CSS, so the two do not fight over `transform`. */
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cart-toggle.is-on .cart-toggle__knob { background: #ffffff; }
+
+/* Items card + Add More Items travel together at the Figma 20px rhythm,
+   which is tighter than the 32px between top-level sections. */
+.cart-section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- items card ---------- */
+.items-card__tag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #fef7e5;
+  color: #6d3b02;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 15px;
+}
+.items-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 21px;
+  margin: 8px 0 0;
+}
+.items-card__when { display: flex; align-items: center; gap: 4px; }
+.items-card__when-label { font-size: 16px; font-weight: 400; color: var(--c-muted); }
+.items-card__when-value { font-size: 16px; font-weight: 700; color: var(--c-ink); }
+.items-card__slot {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--c-green);
+  background: none; border: 0; padding: 0;
+  cursor: pointer;
+}
+.items-card__rule {
+  height: 0;
+  margin: 15px 0 16px;
+  border-top: 1px dashed var(--c-divider);
+}
+/* No `gap` here on purpose: a removed row has to collapse its own spacing too,
+   and flex gap cannot be animated per item. Each row owns its bottom margin. */
+.items-card__list { display: flex; flex-direction: column; }
+.item-row-wrap {
+  height: var(--c-row-h);
+  margin-bottom: var(--c-row-gap);
+  overflow: hidden;
+}
+.items-card__list > .item-row-wrap:last-child { margin-bottom: 0; }
+
+/* ---------- item row ---------- */
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--c-row-h);
+}
+.item-row__thumb {
+  flex: none;
+  width: 54px; height: 54px;
+  border-radius: 8px;
+  background: var(--c-thumb-bg);
+  overflow: hidden;
+}
+.item-row__thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.item-row__main {
+  position: relative;
+  flex: 1 1 auto;
+  height: var(--c-row-h);
+}
+.item-row__info {
+  position: absolute;
+  left: 0; top: 10px;
+  width: 171px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.item-row__names { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.item-row__name {
+  font-size: 13px; font-weight: 500; line-height: 17px;
+  color: var(--c-ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.item-row__weight { font-size: 10px; font-weight: 500; line-height: 13px; color: var(--c-muted); }
+.item-row__prices {
+  flex: none;
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+}
+.item-row__price { font-size: 14px; font-weight: 700; line-height: 19px; color: var(--c-ink); }
+.item-row__was {
+  font-size: 10px; font-weight: 500; line-height: 13px;
+  color: var(--c-muted); text-decoration: line-through;
+}
+
+/* ---------- stepper ---------- */
+.stepper {
+  position: absolute;
+  left: 181px; top: 14px;
+  width: 87px; height: 32px;
+  border-radius: 4px;
+  background: var(--c-green-tint);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+.stepper__btn {
+  width: 12px; height: 12px;
+  border: 0; background: none; padding: 0;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+/* Fixed slot so the sliding count never nudges the − and + apart. */
+.stepper__count-slot {
+  position: relative;
+  width: 22px; height: 17px;
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+.stepper__count {
+  grid-area: 1 / 1;
+  font-size: 13px; font-weight: 700; line-height: 17px;
+  color: var(--c-green);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- add more items ---------- */
+.add-more {
+  width: var(--c-content-w);
+  height: 44px;
+  border-radius: 12px;
+  background: var(--c-subtle);
+  border: 1px solid rgba(229, 231, 235, 0.35);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.add-more__avatars { width: 65px; height: 28px; display: block; }
+.add-more__label { font-size: 13px; font-weight: 500; line-height: 17px; color: var(--c-ink); }
+
+/* ---------- section shell ---------- */
+.cart-section { display: flex; flex-direction: column; gap: 12px; }
+.cart-section__title {
+  margin: 0;
+  font-size: 18px; font-weight: 700; line-height: 24px;
+  color: var(--c-ink);
+}
+.cart-section__head {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 24px;
+}
+
+/* full-width pale pill: "Add Wallet Balance", "View All Coupons and Offers" */
+.cart-pill {
+  width: var(--c-content-w);
+  height: 44px;
+  border-radius: 12px;
+  background: var(--c-subtle);
+  border: 1px solid rgba(229, 231, 235, 0.35);
+  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: var(--c-ink);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- wallet ---------- */
+.wallet__rows { display: flex; flex-direction: column; }
+.wallet__row {
+  height: 35px;
+  display: flex; align-items: center; gap: 12px;
+}
+.wallet__logo { flex: none; width: 35px; height: 35px; border-radius: 5px; display: block; }
+.wallet__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wallet__name { font-size: 13px; font-weight: 500; line-height: 17px; color: var(--c-ink); }
+.wallet__balance { font-size: 12px; font-weight: 400; line-height: 16px; color: var(--c-muted); }
+.wallet__balance em { font-style: normal; color: var(--c-green); font-weight: 500; }
+.wallet__rule { height: 0; margin: 12px 0; border-top: 1px dashed var(--c-divider); }
+
+.cbox {
+  flex: none;
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1.5px solid #d0d5dd;
+  padding: 0;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background 0.16s linear, border-color 0.16s linear;
+}
+.cbox.is-on { background: var(--c-green); border-color: var(--c-green); }
+
+/* ---------- rolling money value ---------- */
+.rolling {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+/* Both layers occupy the same grid cell, so the slot keeps its size while a
+   value rolls and nothing beside it moves. */
+.rolling__sizer { grid-area: 1 / 1; visibility: hidden; }
+.rolling__value { grid-area: 1 / 1; white-space: nowrap; }
+
+/* ---------- coupons ---------- */
+.coupons__rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  /* bleed to the phone edge so the next card peeks, as in Figma */
+  /* Negative margin cancels the extra vertical padding, so the rail occupies
+     the same height as before while giving the confetti room to leave the card
+     — overflow-x:auto makes overflow-y auto too, so it clips vertically. */
+  margin: -24px calc(var(--c-gutter) * -1);
+  padding: 28px var(--c-gutter);
+  /* Without this, scroll-snap aligns the first card to the container edge and
+     silently scrolls past padding-left, so the rail loses its gutter. */
+  scroll-padding-left: var(--c-gutter);
+}
+.coupons__rail::-webkit-scrollbar { height: 0; }
+/* Drag affordance for the rails — a mouse cannot scroll them sideways. */
+.coupons__rail, .dyf__rail { cursor: grab; touch-action: pan-y; }
+.coupons__rail.is-dragging, .dyf__rail.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+.coupons__rail.is-dragging *, .dyf__rail.is-dragging * { user-select: none; }
+.coupon-card {
+  position: relative;
+  flex: none;
+  width: 308px;
+  scroll-snap-align: start;
+  background: var(--c-card);
+  border-radius: var(--c-card-radius);
+  box-shadow: var(--c-card-shadow);
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 13px;
+}
+.coupon-card__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--c-card-radius);
+  /* Static shadow, animated only via opacity — composited, so pulsing it does
+     not repaint the rail and its neighbours. */
+  box-shadow: 0 0 0 2px rgba(3, 152, 85, 0.5);
+  pointer-events: none;
+}
+.coupon-card__top { display: flex; align-items: flex-start; gap: 10px; }
+.coupon-card__logo { flex: none; width: 32px; height: 32px; border-radius: 50%; display: block; }
+.coupon-card__body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.coupon-card__title { font-size: 14px; font-weight: 700; line-height: 19px; color: var(--c-ink); }
+/* One line, always. The applied copy ("NB2025 applied · You saved ₹20") is a
+   few pixels longer than the unapplied one and would otherwise wrap, resizing
+   the card at the exact moment the strip is wiping in. */
+.coupon-card__meta {
+  font-size: 12px; font-weight: 400; line-height: 16px; color: var(--c-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.coupon-card__action {
+  flex: none; align-self: center;
+  /* Fixed width so APPLY → REMOVE crossfades in place instead of reflowing. */
+  width: 58px;
+  text-align: right;
+  background: none; border: 0; padding: 0;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--c-green);
+  cursor: pointer;
+}
+.coupon-card__rule { height: 0; border-top: 1px solid var(--c-divider); }
+.coupon-card__nudge {
+  background: #f6eefb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.coupon-card__nudge-text {
+  flex: 1 1 auto;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  color: #8020b4;
+}
+/* Nudge and applied strip share one slot, so the card height never changes
+   when one replaces the other. */
+.coupon-card__slot { position: relative; }
+.coupon-card__check {
+  position: relative;
+  flex: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--c-green);
+  display: grid; place-items: center;
+}
+
+/* Burst origin is the centre of the check. Zero-size so the particles'
+   own transforms are measured from that exact point. */
+.confetti {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 0; height: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.confetti__bit { position: absolute; left: 0; top: 0; }
+.confetti__flash {
+  position: absolute;
+  left: -9px; top: -9px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(3,152,85,0.55) 0%, rgba(3,152,85,0) 70%);
+}
+.coupon-card__applied {
+  position: absolute;
+  inset: 0;
+  background: #e8f7ef;
+  border-radius: 8px;
+  padding: 9px 10px;
+  box-sizing: border-box;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--c-green);
+}
+
+/* ---------- did you forget ---------- */
+.dyf__rail {
+  display: flex; gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  margin: 0 calc(var(--c-gutter) * -1);
+  padding: 0 var(--c-gutter);
+  scroll-padding-left: var(--c-gutter);
+}
+.dyf__rail::-webkit-scrollbar { height: 0; }
+.dyf-card {
+  flex: none;
+  width: 111px;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 4px;
+  background: none; border: 0; padding: 0;
+  text-align: left;
+  font-family: inherit;
+}
+.dyf-card__media {
+  position: relative;
+  width: 111px; height: 143px;
+  border-radius: 8px;
+  border: 1px solid rgba(234, 229, 219, 0.4);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.dyf-card__media img {
+  position: absolute;
+  top: -4px; left: 0;
+  width: 111px; height: 147px;
+  object-fit: cover;
+  display: block;
+}
+.dyf-card__badge {
+  position: absolute;
+  left: 4px; top: 92px;
+  width: 103px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: rgba(0, 77, 255, 0.58);
+  color: #f2f5fc;
+  font-size: 10px; font-weight: 500; line-height: 13px;
+  text-align: center;
+}
+.dyf-card__info { display: flex; flex-direction: column; gap: 4px; }
+.dyf-card__weight { font-size: 12px; font-weight: 500; line-height: 16px; color: var(--c-ink); }
+.dyf-card__prices { display: flex; align-items: baseline; gap: 4px; }
+.dyf-card__price { font-size: 16px; font-weight: 700; line-height: 21px; color: var(--c-ink); }
+.dyf-card__was {
+  font-size: 10px; font-weight: 400; line-height: 13px;
+  color: var(--c-muted); text-decoration: line-through;
+}
+.dyf-card__name {
+  font-size: 13px; font-weight: 500; line-height: 17px; color: var(--c-ink);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.dyf-card__eta { font-size: 10px; font-weight: 500; line-height: 13px; color: var(--c-muted); }
+.dyf-card__add {
+  margin-top: 4px;
+  height: 38px;
+  border-radius: 4px;
+  border: 0;
+  background: #dff5e6;
+  color: var(--c-green);
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- membership ---------- */
+.membership__art {
+  width: var(--c-content-w);
+  height: 260px;
+  border-radius: 10px;
+  display: block;
+  object-fit: cover;
+}
+
+/* ---------- bill ---------- */
+.bill__savings {
+  background: #e8f7ef;
+  border-radius: 6px;
+  padding: 7px 10px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  color: var(--c-green);
+}
+.bill__rule { height: 0; border-top: 1px dashed var(--c-divider); }
+.bill__lines { display: flex; flex-direction: column; gap: 13px; }
+/* Positioned so the change wash can sit behind the row. */
+.bill__line { position: relative; display: flex; flex-direction: column; }
+.bill__line-top {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; line-height: 17px;
+}
+/* Figma inks labels #1d2939 — the same as values, not the lighter secondary. */
+.bill__line-label { color: var(--c-ink); }
+.bill__line-label--linked { border-bottom: 1px dashed #b8bfca; cursor: pointer; }
+/* Green money: Figma's #039855 misses AA for 13px text on white, so #027a48 —
+   visually the same green, at 5.1:1. */
+.bill__line-label--credit { color: #027a48; }
+.bill__line-value { display: flex; align-items: baseline; gap: 5px; color: var(--c-ink); font-weight: 500; }
+.bill__line-amount { transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.bill__line-amount--credit,
+.bill__line-amount--free { color: #027a48; font-weight: 600; }
+/* The moment a fee flips. Behind the row, animating opacity and scale only —
+   no horizontal bleed, because the bill's height animator clips its sides. */
+.bill__line-wash {
+  position: absolute;
+  inset: -3px 0;
+  z-index: 0;
+  border-radius: 6px;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.bill__line-wash--waived { background: #e8f7ef; }
+.bill__line-wash--charged { background: #fef4dc; }
+
+.bill__total {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 21px;
+}
+.bill__total-label { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--c-ink); }
+.bill__total-value { display: flex; align-items: center; gap: 8px; }
+.bill__total-prices { display: flex; align-items: baseline; gap: 5px; }
+.bill__was {
+  font-size: 13px; font-weight: 500; line-height: 17px;
+  color: var(--c-muted); text-decoration: line-through;
+}
+.bill__now { font-size: 16px; font-weight: 700; line-height: 21px; color: var(--c-ink); }
+
+/* Figma opens the tooltip above its row, caret down at the label. The anchor
+   sits at the row's top and lifts the tip by its own height, so the tooltip
+   never has to be measured. */
+.bill__tip-anchor {
+  position: absolute;
+  left: 12px;
+  z-index: 4;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+.bill__tip {
+  position: relative;
+  display: flex; flex-direction: column; gap: 10px;
+  min-width: 212px; max-width: 260px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #1d2939;
+  color: #f2f4f7;
+  font-size: 11px; font-weight: 400; line-height: 16px;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.22);
+  pointer-events: auto;
+}
+.bill__tip::before {
+  content: '';
+  position: absolute;
+  left: 18px; bottom: -4px;
+  width: 8px; height: 8px;
+  background: #1d2939;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+.bill__tip-row { display: flex; flex-direction: column; gap: 2px; }
+.bill__tip-head {
+  display: flex; justify-content: space-between; gap: 16px;
+  font-size: 13px; font-weight: 500; line-height: 18px;
+  color: #ffffff;
+}
+.bill__tip-value { font-weight: 600; }
+.bill__tip-note { font-size: 11px; line-height: 15px; color: #c9d0da; }
+
+.bill__toggle {
+  display: grid; place-items: center;
+}
+.bill-card { cursor: pointer; position: relative; }
+/* Tapping must not leave a focus ring; keyboard focus still gets one. */
+.bill-card:focus { outline: none; }
+.bill-card:focus-visible { outline: 2px solid var(--c-green); outline-offset: 2px; }
+.bill__toggle svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.bill__toggle.is-open svg { transform: rotate(180deg); }
+
+/* ---------- gstin ---------- */
+/* flex-direction is explicit: .cart-card is now a column, and this row would
+   otherwise inherit it and stack the icon above the text. */
+.gstin {
+  display: flex; flex-direction: row; align-items: center; gap: 13px;
+}
+.gstin__icon {
+  flex: none; width: 36px; height: 36px; border-radius: 8px;
+  background: #e0f7eb;
+  display: grid; place-items: center;
+}
+.gstin__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; }
+.gstin__title { font-size: 15px; font-weight: 600; line-height: 20px; color: var(--c-ink); }
+.gstin__sub { font-size: 11px; font-weight: 400; line-height: 15px; color: var(--c-muted); }
+
+/* ---------- delivery instructions ---------- */
+/* The rail is the card's only child and is deliberately made coincident with
+   it — negative margin on all four sides, the padding given back as inset —
+   so its scroll clip can carry the card's own radius. Bleeding horizontally
+   only (margin: 0 -12px) left the clip box square while the card was rounded,
+   which sliced the partly-visible tile flat across the corner.
+   Figma cuts that tile too; it is the scroll affordance. Only the corner was wrong. */
+.di__rail {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  margin: calc(var(--c-card-pad) * -1);
+  padding: var(--c-card-pad);
+  border-radius: var(--c-card-radius);
+  cursor: grab;
+  touch-action: pan-y;
+}
+.di__rail.is-dragging { cursor: grabbing; }
+.di__rail::-webkit-scrollbar { height: 0; }
+.di__tile {
+  flex: none;
+  width: 133px;
+  border-radius: 10px;
+  background: var(--c-subtle);
+  border: 1px solid var(--c-hairline);
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 10px;
+  cursor: pointer;
+  transition: background 0.16s linear, border-color 0.16s linear;
+}
+.di__tile.is-on { background: var(--c-green-pale); border-color: var(--c-green); }
+.di__tile-top { display: flex; align-items: center; justify-content: space-between; }
+.di__tile-label { font-size: 13px; font-weight: 500; line-height: 17px; color: #344054; white-space: nowrap; }
+.di__tile.is-on .di__tile-label { color: #027a48; }
+.di__record { display: flex; align-items: center; gap: 6px; }
+.di__record-label { font-size: 12px; font-weight: 700; color: var(--c-green); }
+.di__hint { font-size: 11px; font-weight: 500; color: var(--c-muted); }
+
+/* ---------- cancellation policy ---------- */
+.policy__body {
+  font-size: 12px; font-weight: 400; line-height: 18px;
+  color: var(--c-muted);
+  margin: 0;
+}
+
+/* ---------- empty cart ---------- */
+.cart-empty {
+  position: absolute;
+  left: 32px; right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.cart-empty__disc {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--c-green-pale);
+  display: grid; place-items: center;
+  margin-bottom: 20px;
+}
+.cart-empty__title {
+  margin: 0 0 6px;
+  font-size: 18px; font-weight: 700; line-height: 24px; color: var(--c-ink);
+}
+.cart-empty__body {
+  margin: 0 0 22px;
+  font-size: 13px; font-weight: 400; line-height: 19px; color: var(--c-muted);
+}
+.cart-empty__cta {
+  padding: 14px 28px;
+  border: 0; border-radius: 8px;
+  background: var(--c-green);
+  color: #ffffff;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- sticky footer ---------- */
+.cart-footer {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: var(--c-phone-w);
+  z-index: 5;
+}
+.cart-footer__address {
+  height: 56px;
+  background: var(--c-green-pale);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+.cart-footer__pin {
+  flex: none;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: var(--c-green-icon-bg);
+  display: grid; place-items: center;
+}
+.cart-footer__addr { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cart-footer__addr-title { font-size: 15px; font-weight: 500; line-height: 20px; color: var(--c-ink); }
+.cart-footer__addr-title b { font-weight: 700; }
+.cart-footer__addr-sub {
+  font-size: 12px; font-weight: 500; line-height: 16px; color: var(--c-ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cart-footer__change {
+  flex: none;
+  font-size: 12px; font-weight: 700; line-height: 15px;
+  color: var(--c-green);
+  background: none; border: 0; padding: 0; cursor: pointer;
+}
+.cart-footer__nav {
+  height: 64px;
+  background: var(--c-page);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  box-sizing: border-box;
+}
+.cart-footer__method {
+  width: 148px; height: 44px;
+  background: var(--c-chip);
+  border-radius: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex; align-items: center; gap: 4px;
+  border: 0; cursor: pointer;
+}
+.cart-footer__method-text { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; min-width: 0; }
+.cart-footer__method-row { display: flex; align-items: center; gap: 4px; }
+.cart-footer__method-name { font-size: 12px; font-weight: 500; line-height: 15px; color: var(--c-ink); }
+.cart-footer__method-num { font-size: 10px; font-weight: 500; line-height: 13px; color: var(--c-muted); }
+.cart-footer__method-secure { font-size: 10px; font-weight: 500; line-height: 13px; color: var(--c-green); }
+.cart-footer__pay {
+  flex: 1 1 auto;
+  height: 43px;
+  border-radius: 5px;
+  border: 1px solid var(--c-green);
+  background: linear-gradient(90deg, var(--c-pay-from) 0%, var(--c-pay-mid) 50%, var(--c-pay-from) 100%);
+  color: #fefefe;
+  font-family: inherit;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-screen * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- incognito sheet ---------- */
+/* Figma row 09, "Incognito Mode On · revised" (2280:7000). Geometry is measured
+   from the card's top edge, which sits flush with the bottom of the phone. */
+.incog-sheet { position: absolute; inset: 0; z-index: 10; }
+.incog-sheet__scrim {
+  position: absolute; inset: 0;
+  background: rgba(53, 53, 53, 0.75);
+}
+/* Floats 153px above the card, 20px in from the right. */
+.incog-sheet__close {
+  position: absolute;
+  right: 20px; bottom: calc(252px + 153px);
+  width: 38px; height: 38px;
+  border: 0; padding: 0; border-radius: 50%;
+  background: rgba(234, 229, 219, 0.71);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.incog-sheet__close:focus-visible,
+.incog-sheet__card:focus-visible { outline: 2px solid #ae0101; outline-offset: 2px; }
+/* The whole card is the confirmation — Figma's revised sheet has no CTA. */
+.incog-sheet__card {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 252px;
+  margin: 0; border: 0; padding: 0;
+  border-radius: 50px 50px 0 0;
+  background: linear-gradient(0deg, #ffc1b6 8%, #f9d8cd 59%, #fff0ed 100%);
+  font: inherit; text-align: center;
+  cursor: pointer;
+}
+/* Stands 105px above the card edge, centred. */
+.incog-sheet__rider {
+  position: absolute;
+  left: calc(50% - 77.5px); top: -105px;
+  width: 155px; height: 194px;
+  pointer-events: none;
+}
+.incog-sheet__title {
+  position: absolute; left: 20px; right: 20px; top: 104px;
+  font-size: 30px; font-weight: 700; line-height: 38px;
+  color: #ae0101;
+}
+.incog-sheet__body {
+  position: absolute; left: 20px; right: 20px; top: 169px;
+  font-size: 16px; font-weight: 600; line-height: 19px;
+  color: #a81f22;
+  opacity: 0.85;
+}
+
+/* Press feedback lives on the contents, never the card. The card is full-bleed:
+   scaling it to 0.985 opened a ~3px gap on each side where the dark scrim showed
+   through, and it was still open as the sheet began to leave. */
+.incog-sheet__content { position: absolute; inset: 0; display: block; }

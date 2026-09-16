@@ -7,6 +7,7 @@ type Props = {
 
 export function InteractionPanel({ interaction }: Props) {
   const InteractionComponent = interaction.Component;
+  const Aside = interaction.Aside;
 
   return (
     <div className="interaction-panel">
@@ -20,6 +21,11 @@ export function InteractionPanel({ interaction }: Props) {
           <PhoneShell>
             <InteractionComponent key={interaction.id} />
           </PhoneShell>
+          {Aside && (
+            <aside className="interaction-aside">
+              <Aside key={interaction.id} />
+            </aside>
+          )}
         </div>
       </div>
     </div>
